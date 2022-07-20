@@ -106,9 +106,11 @@ $$
 In the range $-1, 1$ we would get the coefficients:
 
 $$
+\displaylines{
 c_n=\int_{-1}^1 h(x)b_n(x)dx \newline
 c_0=\int_{-1}^{1}(\frac{3}{4}x+\frac{1}{4})(\frac{1}{2}x)dx=\frac{1}{4} \newline
 c_1=\int_{-1}^{1}(\frac{3}{4}x+3)(x)dx=\frac{1}{2}
+}
 $$
 
 If we then try to reconstruct our function with $h(x)=c_0b_0(x)+c_1b_1(x)$ we get
@@ -132,22 +134,28 @@ Oops! That's not our source function at all...
 If instead, we use the first 2 functions from the fundamental function of our spherical harmonics the Associated Legendre Polynomials we get:
 
 $$
+\displaylines{
 b_0(x)=1 \newline
 b_1(x)=x
+}
 $$
 
 If we use these as our basis functions, we also need to normalize our coefficients [2] with $norm_n = \frac{2n+1}{2}$
 
 $$
+\displaylines{
 c_0=norm_0\int_{-1}^{1}(\frac{3}{4}x+\frac{1}{4})(1)dx=norm_0\frac{2}{4}=\frac{1}{2}\frac{2}{4}=\frac{1}{4} \newline
 c_1=norm_1\int_{-1}^{1}(\frac{3}{4}x+\frac{1}{4})(x)dx=norm_1\frac{1}{2}=\frac{3}{2}\frac{1}{2}=\frac{3}{4}
+}
 $$
 
 Combining them
 
 $$
+\displaylines{
 h(x)=c_0+c_1x \newline
 h(x)=\frac{1}{4}+\frac{3}{4}x
+}
 $$
 
 Tada! We've moved from our function to constants for our basis and back. 
@@ -199,6 +207,7 @@ $$
 The Associated Legendre Polynomials are only the first part of the picture for our spherical harmonics. The set of spherical harmonic functions are fully defined as:
 
 $$
+\displaylines{
 Y_l^m(\theta,\phi)=\left \{
 \begin{array}{ll}
       \sqrt{2}K_l^{-m}P_l^{-m}(cos(\theta))sin(-m\phi) & m < 0 \newline
@@ -206,6 +215,7 @@ Y_l^m(\theta,\phi)=\left \{
       \sqrt{2}K_l^mP_l^m(cos(\theta))cos(m\phi) & m > 0 \newline
 \end{array}
 \right.
+}
 $$
 
 Where $P$ is our Associated Legendre Polynomial, $K$ is a normalization constant (we will be touching on what this means and why this is necessary soon), $l$ is our spherical harmonic band or order, $m$ is the index within that order where $-l \leq m \leq l$, $\theta$ is the angle from our pole and $\phi$ is our horizon angle.
@@ -317,9 +327,11 @@ One of the most valuable properties of spherical harmonics is that the integral 
 In essence, given two functions defined as a set of spherical harmonic coefficients:
 
 $$
+\displaylines{
 f(x)=c_0,c_1,c_2,...,c_n \newline
 g(x)=k_0,k_1,k_2,...,k_n \newline
 \int f(x)g(x)dx \approx c_0k_0+c_1k_1+c_2k_2+...+c_nk_n
+}
 $$
 
 This property, if true, could be very valuable!
@@ -357,15 +369,19 @@ I think this is very clever and very interesting. I hope you find it even slight
 For illustration, we will start with two functions that are only represented using 2 coefficients.
 
 $$
+\displaylines{
 f(x)=c_0,c_1 \newline
 g(x)=k_0,k_1
+}
 $$
 
 As we've seen before, with these coefficients, we can reconstruct an approximation of the functions by applying the coefficients to our basis functions:
 
 $$
+\displaylines{
 f(x) \approx c_0b_0(x)+c_1b_1(x) \newline
 g(x) \approx k_0b_0(x)+k_1b_1(x)
+}
 $$
 
 With this approximation, we can substitute our two functions with our new formulation.
@@ -389,8 +405,10 @@ $$
 You may now be thinking that we haven't really simplified anything, but if you remember that our functions form an orthogonal basis. As a result
 
 $$
+\displaylines{
 \int f_i(x)f_j(x)dx=0, i\neq j \newline
 \int f_i(x)f_i(x)dx=c
+}
 $$
 
 Which in this case means
@@ -402,8 +420,10 @@ $$
 And
 
 $$
+\displaylines{
 \int b_0(x)^2dx=C \newline
 \int b_1(x)^2dx=K \newline
+}
 $$
 
 With these identities, our middle term $2k_0c_1\int b_0(x)b_1(x)dx$ cancels out!
@@ -411,9 +431,11 @@ With these identities, our middle term $2k_0c_1\int b_0(x)b_1(x)dx$ cancels out!
 And our outermost terms become
 
 $$
+\displaylines{
 k_0c_0\int b_0(x)^2dx = k_0c_0C \newline
 c_1k_1\int b_1(x)^2dx = k_1c_1K \newline
 \int f(x)g(x)dx \approx k_0c_0C+c_1k_1K
+}
 $$
 
 But now we're stuck with some pesky constants that we don't know...
@@ -449,14 +471,17 @@ $$
 As we are canceling out our constant term by dividing by our root such that
 
 $$
+\displaylines{
 \int f_i(x)f_i(x)dx=c \newline
 \frac{1}{c}\int f_i(x)f_i(x)dx=1 \newline
-\int \frac{1}{\sqrt c}f_i(x)\frac{1}{\sqrt c}f_i(x)dx=1 \newline
+\int \frac{1}{\sqrt c}f_i(x)\frac{1}{\sqrt c}f_i(x)dx=1
+}
 $$
 
 Looking at our spherical harmonic functions again
 
 $$
+\displaylines{
 Y_l^m(\theta,\phi)=\left \{
 \begin{array}{ll}
       \sqrt{2}K_l^{-m}P_l^{-m}(cos(\theta))sin(-m\phi) & m < 0 \newline
@@ -464,6 +489,7 @@ Y_l^m(\theta,\phi)=\left \{
       \sqrt{2}K_l^mP_l^m(cos(\theta))cos(m\phi) & m > 0 \newline
 \end{array}
 \right.
+}
 $$
 
 If we assume that this theory about our normalization constants is true, then we should be able to see that the first part of our function (when $m=0$)
@@ -487,19 +513,22 @@ $$
 Let's look at a simple case where $l=1, m=0$, as a result
 
 $$
+\displaylines{
 P_1^0(x)=x \newline
 p_1^0(cos(\theta))=cos(\theta)
+}
 $$
 
 To calculate our orthogonal basis constant we need to integrate:
 
 $$
-\int f(x)f(x)dx=c \newline
+\int f(x)f(x)dx=c
 $$
 
 Since we're integrating on a sphere using our spherical harmonic function we get
 
 $$
+\displaylines{
 \int_0^{2\pi}\int_0^{\pi}SphericalHarmonic_1^0(\theta,\phi)^2sin(\theta)d\theta d\phi=c \newline
 \int_0^{2\pi}\int_0^{\pi}P_1^0(cos(\theta))^2sin(\theta)d\theta d\phi=c \newline
 Since \space \int_0^{2\pi}d\phi=2\pi \newline
@@ -510,6 +539,7 @@ Where \space \int_0^{\pi} cos(\theta)^2sin(\theta)d\theta=-\frac{1}{3}cos(\pi)^3
 -\frac{1}{3}cos(\pi)^3+\frac{1}{3}cos(0)^3=\frac{2}{3} \newline
 Thus \space 2\pi\frac{2}{3}=c \newline
 c = \frac{4\pi}{3}
+}
 $$
 
 If $c=\frac{4\pi}{3}$ then given the logic above that our normalization constant should be
@@ -533,9 +563,11 @@ $$
 We get
 
 $$
+\displaylines{
 K_l^m=\sqrt{\frac{(2l+1)}{4\pi} \frac{(l-m)!}{(l+m)!}} \newline
 K_1^0=\sqrt{\frac{(2*1+1)}{4\pi} \frac{(1-0)!}{(1+0)!}} \newline
-K_1^0=\sqrt{\frac{3}{4\pi}} \newline
+K_1^0=\sqrt{\frac{3}{4\pi}}
+}
 $$
 
 Matching our derived normalization constant!
@@ -556,8 +588,10 @@ As a part of our normalization constant derivation.
 However, when $m \neq 0$ we have the additional terms
 
 $$
+\displaylines{
 sin(-m\phi) & m < 0 \newline
 cos(m\phi) & m > 0
+}
 $$
 
 You'll note that this changes our integration of $\phi$ from
@@ -577,8 +611,10 @@ $$
 If we calculate the result of this integral, we get
 
 $$
-\int_0^{2\pi}sin(-m\phi)^2d\phi=\pi & m < 0\newline
+\displaylines{
+\int_0^{2\pi}sin(-m\phi)^2d\phi=\pi & m < 0 \newline
 \int_0^{2\pi}cos(m\phi)^2d\phi=\pi & m > 0
+}
 $$
 
 You'll notice that we're missing a factor of 2 from this integral as opposed to the version without a $cos$ or $sin$ term!
@@ -596,8 +632,10 @@ $$
 By using the fact that
 
 $$
+\displaylines{
 \int f_i(x)f_j(x)dx=0, i\neq j \newline
 \int f_i(x)f_i(x)dx=c
+}
 $$
 
 But not only that the constant of a the product of a single function is $c$ but that in our case, the product is 1!
@@ -637,18 +675,22 @@ $$
 As we saw before, we can define our function in terms of our basis coefficients and our basis functions
 
 $$
+\displaylines{
 f(x) \approx c_0b_0(x)+c_1b_1(x)+...+c_nb_n(x) \newline
 g(x) \approx k_0b_0(x)+k_1b_1(x)+...+k_nb_n(x)
+}
 $$
 
 If we plug these into our lerp equation (using the 2 coefficient form for simplicity)
 
 $$
+\displaylines{
 lerp(f(x), g(x), t)=(1-t)(c_0b_0(x)+c_1b_1(x))+t(k_0b_0(x)+k_1b_1(x)) \newline 
 lerp(f(x), g(x), t)=(1-t)c_0b_0(x)+(1-t)c_1b_1(x)+tk_0b_0(x)+tk_1b_1(x) \newline
 Rearranging \newline
 lerp(f(x), g(x), t)=(1-t)c_0b_0(x)+tk_0b_0(x)+(1-t)c_1b_1(x)+tk_1b_1(x) \newline
 lerp(f(x), g(x), t)=((1-t)c_0+tk_0)b_0(x)+((1-t)c_1+tk_1)b_1(x)
+}
 $$
 
 If we look at the final form of our equation
@@ -660,15 +702,19 @@ $$
 We can package the terms before our basis functions as new basis coefficients
 
 $$
+\displaylines{
 m_0=(1-t)c_0+tk_0 \newline
 m_1=(1-t)c_1+tk_1
+}
 $$
 
 Which as we've seen above, is the form of our $lerp$ function!
 
 $$
+\displaylines{
 m_0=lerp(c_0,k_0,t) \newline
 m_1=lerp(c_1, k_1, t)
+}
 $$
 
 #### Addition Of Coefficients And Multiplication By A Scalar
@@ -686,11 +732,13 @@ $$
 Replacing our functions with our coefficients and basis functions we get:
 
 $$
+\displaylines{
 f(x)+g(x) \approx c_0b_0(x)+c_1b_1(x)+k_0b_0(x)+k_1b_1(x) \newline
 f(x)+g(x) \approx c_0b_0(x)+k_0b_0(x)+c_1b_1(x)+k_1b_1(x) \newline
 f(x)+g(x) \approx (c_0+k_0)b_0(x)+(c_1+k_1)b_1(x) \newline
 m_0=c_0+k_0 \newline
 m_1=c_1+k_1
+}
 $$
 
 ##### Multiplication By A Scalar
@@ -704,10 +752,12 @@ $$
 Replacing our functions with our coefficients and basis functions we get:
 
 $$
+\displaylines{
 Af(x) \approx A(c_0b_0(x)+c_1b_1(x)) \newline
 Af(x) \approx Ac_0b_0(x)+Ac_1b_1(x) \newline
 m_0=Ac_0 \newline
 m_1=Ac_1
+}
 $$
 
 And we're done! The math is complete! Thanks for reading all the way to the end of this part!
