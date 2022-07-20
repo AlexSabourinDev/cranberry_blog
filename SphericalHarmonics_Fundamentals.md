@@ -574,18 +574,20 @@ Matching our derived normalization constant!
 
 <details>
 
-<summary> <u>Why do we need $\sqrt{2}$ in our normalization constant when $m \neq 0$</u> </summary>
+<summary> **Why do we need $\sqrt{2}$ in our normalization constant when $m \neq 0$** </summary>
 
-> The reason we need $\sqrt{2}$ when $m \neq 0$ is relatively simple.
->
-> Above, we used the property that
+---
+
+The reason we need $\sqrt{2}$ when $m \neq 0$ is relatively simple.
+
+Above, we used the property that
 
 $$
 \int_0^{2\pi}d\phi=2\pi
 $$
-> As a part of our normalization constant derivation.
->
-> However, when $m \neq 0$ we have the additional terms
+As a part of our normalization constant derivation.
+
+However, when $m \neq 0$ we have the additional terms
 
 $$
 \displaylines{
@@ -594,21 +596,21 @@ cos(m\phi) & m > 0
 }
 $$
 
-> You'll note that this changes our integration of $\phi$ from
+You'll note that this changes our integration of $\phi$ from
 
 $$
 \int_0^{2\pi}d\phi=2\pi
 $$
 
-> to
+to
 
 $$
 \int_0^{2\pi}cos(m\phi)^2d\phi=y
 $$
 
-> (Using $m > 0$ as an example here and squared due to how we're calculating our basis constant)
->
-> If we calculate the result of this integral, we get
+(Using $m > 0$ as an example here and squared due to how we're calculating our basis constant)
+
+If we calculate the result of this integral, we get
 
 $$
 \displaylines{
@@ -617,9 +619,11 @@ $$
 }
 $$
 
-> You'll notice that we're missing a factor of 2 from this integral as opposed to the version without a $cos$ or $sin$ term!
->
-> However, our original normalization constant was written with the expectation that we would have a factor of $2\pi$. As a result, we need to reintroduce this factor as a new constant. (As a square root here because of the formulation of our normalization constant as explained above)
+You'll notice that we're missing a factor of 2 from this integral as opposed to the version without a $cos$ or $sin$ term!
+
+However, our original normalization constant was written with the expectation that we would have a factor of $2\pi$. As a result, 	we need to reintroduce this factor as a new constant. (As a square root here because of the formulation of our normalization 	constant as explained above)
+
+---
 
 </details>
 
