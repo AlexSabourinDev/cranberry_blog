@@ -106,8 +106,8 @@ $$
 In the range $-1, 1$ we would get the coefficients:
 
 $$
-c_n=\int_{-1}^1 h(x)b_n(x)dx \\
-c_0=\int_{-1}^{1}(\frac{3}{4}x+\frac{1}{4})(\frac{1}{2}x)dx=\frac{1}{4} \\
+c_n=\int_{-1}^1 h(x)b_n(x)dx \newline
+c_0=\int_{-1}^{1}(\frac{3}{4}x+\frac{1}{4})(\frac{1}{2}x)dx=\frac{1}{4} \newline
 c_1=\int_{-1}^{1}(\frac{3}{4}x+3)(x)dx=\frac{1}{2}
 $$
 
@@ -132,21 +132,21 @@ Oops! That's not our source function at all...
 If instead, we use the first 2 functions from the fundamental function of our spherical harmonics the Associated Legendre Polynomials we get:
 
 $$
-b_0(x)=1 \\
+b_0(x)=1 \newline
 b_1(x)=x
 $$
 
 If we use these as our basis functions, we also need to normalize our coefficients [2] with $norm_n = \frac{2n+1}{2}$
 
 $$
-c_0=norm_0\int_{-1}^{1}(\frac{3}{4}x+\frac{1}{4})(1)dx=norm_06=\frac{1}{2}\frac{2}{4}=\frac{1}{4} \\
+c_0=norm_0\int_{-1}^{1}(\frac{3}{4}x+\frac{1}{4})(1)dx=norm_0\frac{2}{4}=\frac{1}{2}\frac{2}{4}=\frac{1}{4} \newline
 c_1=norm_1\int_{-1}^{1}(\frac{3}{4}x+\frac{1}{4})(x)dx=norm_1\frac{1}{2}=\frac{3}{2}\frac{1}{2}=\frac{3}{4}
 $$
 
 Combining them
 
 $$
-h(x)=c_0+c_1x \\
+h(x)=c_0+c_1x \newline
 h(x)=\frac{1}{4}+\frac{3}{4}x
 $$
 
@@ -201,9 +201,9 @@ The Associated Legendre Polynomials are only the first part of the picture for o
 $$
 Y_l^m(\theta,\phi)=\left \{
 \begin{array}{ll}
-      \sqrt{2}K_l^{-m}P_l^{-m}(cos(\theta))sin(-m\phi) & m < 0 \\
-      K_l^0P_l^0(cos(\theta)) & m = 0\\
-      \sqrt{2}K_l^mP_l^m(cos(\theta))cos(m\phi) & m > 0 \\
+      \sqrt{2}K_l^{-m}P_l^{-m}(cos(\theta))sin(-m\phi) & m < 0 \newline
+      K_l^0P_l^0(cos(\theta)) & m = 0\newline
+      \sqrt{2}K_l^mP_l^m(cos(\theta))cos(m\phi) & m > 0 \newline
 \end{array}
 \right.
 $$
@@ -317,8 +317,8 @@ One of the most valuable properties of spherical harmonics is that the integral 
 In essence, given two functions defined as a set of spherical harmonic coefficients:
 
 $$
-f(x)=c_0,c_1,c_2,...,c_n \\
-g(x)=k_0,k_1,k_2,...,k_n \\
+f(x)=c_0,c_1,c_2,...,c_n \newline
+g(x)=k_0,k_1,k_2,...,k_n \newline
 \int f(x)g(x)dx \approx c_0k_0+c_1k_1+c_2k_2+...+c_nk_n
 $$
 
@@ -357,14 +357,14 @@ I think this is very clever and very interesting. I hope you find it even slight
 For illustration, we will start with two functions that are only represented using 2 coefficients.
 
 $$
-f(x)=c_0,c_1 \\
+f(x)=c_0,c_1 \newline
 g(x)=k_0,k_1
 $$
 
 As we've seen before, with these coefficients, we can reconstruct an approximation of the functions by applying the coefficients to our basis functions:
 
 $$
-f(x) \approx c_0b_0(x)+c_1b_1(x) \\
+f(x) \approx c_0b_0(x)+c_1b_1(x) \newline
 g(x) \approx k_0b_0(x)+k_1b_1(x)
 $$
 
@@ -389,7 +389,7 @@ $$
 You may now be thinking that we haven't really simplified anything, but if you remember that our functions form an orthogonal basis. As a result
 
 $$
-\int f_i(x)f_j(x)dx=0, i\neq j \\
+\int f_i(x)f_j(x)dx=0, i\neq j \newline
 \int f_i(x)f_i(x)dx=c
 $$
 
@@ -402,8 +402,8 @@ $$
 And
 
 $$
-\int b_0(x)^2dx=C \\
-\int b_1(x)^2dx=K \\
+\int b_0(x)^2dx=C \newline
+\int b_1(x)^2dx=K \newline
 $$
 
 With these identities, our middle term $2k_0c_1\int b_0(x)b_1(x)dx$ cancels out!
@@ -411,8 +411,8 @@ With these identities, our middle term $2k_0c_1\int b_0(x)b_1(x)dx$ cancels out!
 And our outermost terms become
 
 $$
-k_0c_0\int b_0(x)^2dx = k_0c_0C \\
-c_1k_1\int b_1(x)^2dx = k_1c_1K \\
+k_0c_0\int b_0(x)^2dx = k_0c_0C \newline
+c_1k_1\int b_1(x)^2dx = k_1c_1K \newline
 \int f(x)g(x)dx \approx k_0c_0C+c_1k_1K
 $$
 
@@ -449,9 +449,9 @@ $$
 As we are canceling out our constant term by dividing by our root such that
 
 $$
-\int f_i(x)f_i(x)dx=c \\
-\frac{1}{c}\int f_i(x)f_i(x)dx=1 \\
-\int \frac{1}{\sqrt c}f_i(x)\frac{1}{\sqrt c}f_i(x)dx=1 \\
+\int f_i(x)f_i(x)dx=c \newline
+\frac{1}{c}\int f_i(x)f_i(x)dx=1 \newline
+\int \frac{1}{\sqrt c}f_i(x)\frac{1}{\sqrt c}f_i(x)dx=1 \newline
 $$
 
 Looking at our spherical harmonic functions again
@@ -459,9 +459,9 @@ Looking at our spherical harmonic functions again
 $$
 Y_l^m(\theta,\phi)=\left \{
 \begin{array}{ll}
-      \sqrt{2}K_l^{-m}P_l^{-m}(cos(\theta))sin(-m\phi) & m < 0 \\
-      K_l^0P_l^0(cos(\theta)) & m = 0\\
-      \sqrt{2}K_l^mP_l^m(cos(\theta))cos(m\phi) & m > 0 \\
+      \sqrt{2}K_l^{-m}P_l^{-m}(cos(\theta))sin(-m\phi) & m < 0 \newline
+      K_l^0P_l^0(cos(\theta)) & m = 0\newline
+      \sqrt{2}K_l^mP_l^m(cos(\theta))cos(m\phi) & m > 0 \newline
 \end{array}
 \right.
 $$
@@ -487,28 +487,28 @@ $$
 Let's look at a simple case where $l=1, m=0$, as a result
 
 $$
-P_1^0(x)=x \\
+P_1^0(x)=x \newline
 p_1^0(cos(\theta))=cos(\theta)
 $$
 
 To calculate our orthogonal basis constant we need to integrate:
 
 $$
-\int f(x)f(x)dx=c \\
+\int f(x)f(x)dx=c \newline
 $$
 
 Since we're integrating on a sphere using our spherical harmonic function we get
 
 $$
-\int_0^{2\pi}\int_0^{\pi}SphericalHarmonic_1^0(\theta,\phi)^2sin(\theta)d\theta d\phi=c \\
-\int_0^{2\pi}\int_0^{\pi}P_1^0(cos(\theta))^2sin(\theta)d\theta d\phi=c \\
-Since \space \int_0^{2\pi}d\phi=2\pi \\
-2\pi\int_0^{\pi} P_1^0(cos(\theta))^2sin(\theta)d\theta=c \\
-With \space P_1^0(cos(\theta))=cos(\theta) \\
-2\pi\int_0^{\pi} cos(\theta)^2sin(\theta)d\theta=c \\
-Where \space \int_0^{\pi} cos(\theta)^2sin(\theta)d\theta=-\frac{1}{3}cos(\pi)^3+\frac{1}{3}cos(0)^3 \\
--\frac{1}{3}cos(\pi)^3+\frac{1}{3}cos(0)^3=\frac{2}{3} \\
-Thus \space 2\pi\frac{2}{3}=c \\
+\int_0^{2\pi}\int_0^{\pi}SphericalHarmonic_1^0(\theta,\phi)^2sin(\theta)d\theta d\phi=c \newline
+\int_0^{2\pi}\int_0^{\pi}P_1^0(cos(\theta))^2sin(\theta)d\theta d\phi=c \newline
+Since \space \int_0^{2\pi}d\phi=2\pi \newline
+2\pi\int_0^{\pi} P_1^0(cos(\theta))^2sin(\theta)d\theta=c \newline
+With \space P_1^0(cos(\theta))=cos(\theta) \newline
+2\pi\int_0^{\pi} cos(\theta)^2sin(\theta)d\theta=c \newline
+Where \space \int_0^{\pi} cos(\theta)^2sin(\theta)d\theta=-\frac{1}{3}cos(\pi)^3+\frac{1}{3}cos(0)^3 \newline
+-\frac{1}{3}cos(\pi)^3+\frac{1}{3}cos(0)^3=\frac{2}{3} \newline
+Thus \space 2\pi\frac{2}{3}=c \newline
 c = \frac{4\pi}{3}
 $$
 
@@ -533,9 +533,9 @@ $$
 We get
 
 $$
-K_l^m=\sqrt{\frac{(2l+1)}{4\pi} \frac{(l-m)!}{(l+m)!}} \\
-K_1^0=\sqrt{\frac{(2*1+1)}{4\pi} \frac{(1-0)!}{(1+0)!}} \\
-K_1^0=\sqrt{\frac{3}{4\pi}} \\
+K_l^m=\sqrt{\frac{(2l+1)}{4\pi} \frac{(l-m)!}{(l+m)!}} \newline
+K_1^0=\sqrt{\frac{(2*1+1)}{4\pi} \frac{(1-0)!}{(1+0)!}} \newline
+K_1^0=\sqrt{\frac{3}{4\pi}} \newline
 $$
 
 Matching our derived normalization constant!
@@ -556,7 +556,7 @@ As a part of our normalization constant derivation.
 However, when $m \neq 0$ we have the additional terms
 
 $$
-sin(-m\phi) & m < 0 \\
+sin(-m\phi) & m < 0 \newline
 cos(m\phi) & m > 0
 $$
 
@@ -577,7 +577,7 @@ $$
 If we calculate the result of this integral, we get
 
 $$
-\int_0^{2\pi}sin(-m\phi)^2d\phi=\pi & m < 0\\
+\int_0^{2\pi}sin(-m\phi)^2d\phi=\pi & m < 0\newline
 \int_0^{2\pi}cos(m\phi)^2d\phi=\pi & m > 0
 $$
 
@@ -596,7 +596,7 @@ $$
 By using the fact that
 
 $$
-\int f_i(x)f_j(x)dx=0, i\neq j \\
+\int f_i(x)f_j(x)dx=0, i\neq j \newline
 \int f_i(x)f_i(x)dx=c
 $$
 
@@ -637,17 +637,17 @@ $$
 As we saw before, we can define our function in terms of our basis coefficients and our basis functions
 
 $$
-f(x) \approx c_0b_0(x)+c_1b_1(x)+...+c_nb_n(x) \\
+f(x) \approx c_0b_0(x)+c_1b_1(x)+...+c_nb_n(x) \newline
 g(x) \approx k_0b_0(x)+k_1b_1(x)+...+k_nb_n(x)
 $$
 
 If we plug these into our lerp equation (using the 2 coefficient form for simplicity)
 
 $$
-lerp(f(x), g(x), t)=(1-t)(c_0b_0(x)+c_1b_1(x))+t(k_0b_0(x)+k_1b_1(x)) \\ 
-lerp(f(x), g(x), t)=(1-t)c_0b_0(x)+(1-t)c_1b_1(x)+tk_0b_0(x)+tk_1b_1(x) \\
-Rearranging \\
-lerp(f(x), g(x), t)=(1-t)c_0b_0(x)+tk_0b_0(x)+(1-t)c_1b_1(x)+tk_1b_1(x) \\
+lerp(f(x), g(x), t)=(1-t)(c_0b_0(x)+c_1b_1(x))+t(k_0b_0(x)+k_1b_1(x)) \newline 
+lerp(f(x), g(x), t)=(1-t)c_0b_0(x)+(1-t)c_1b_1(x)+tk_0b_0(x)+tk_1b_1(x) \newline
+Rearranging \newline
+lerp(f(x), g(x), t)=(1-t)c_0b_0(x)+tk_0b_0(x)+(1-t)c_1b_1(x)+tk_1b_1(x) \newline
 lerp(f(x), g(x), t)=((1-t)c_0+tk_0)b_0(x)+((1-t)c_1+tk_1)b_1(x)
 $$
 
@@ -660,14 +660,14 @@ $$
 We can package the terms before our basis functions as new basis coefficients
 
 $$
-m_0=(1-t)c_0+tk_0 \\
+m_0=(1-t)c_0+tk_0 \newline
 m_1=(1-t)c_1+tk_1
 $$
 
 Which as we've seen above, is the form of our $lerp$ function!
 
 $$
-m_0=lerp(c_0,k_0,t) \\
+m_0=lerp(c_0,k_0,t) \newline
 m_1=lerp(c_1, k_1, t)
 $$
 
@@ -686,10 +686,10 @@ $$
 Replacing our functions with our coefficients and basis functions we get:
 
 $$
-f(x)+g(x) \approx c_0b_0(x)+c_1b_1(x)+k_0b_0(x)+k_1b_1(x) \\
-f(x)+g(x) \approx c_0b_0(x)+k_0b_0(x)+c_1b_1(x)+k_1b_1(x) \\
-f(x)+g(x) \approx (c_0+k_0)b_0(x)+(c_1+k_1)b_1(x) \\
-m_0=c_0+k_0 \\
+f(x)+g(x) \approx c_0b_0(x)+c_1b_1(x)+k_0b_0(x)+k_1b_1(x) \newline
+f(x)+g(x) \approx c_0b_0(x)+k_0b_0(x)+c_1b_1(x)+k_1b_1(x) \newline
+f(x)+g(x) \approx (c_0+k_0)b_0(x)+(c_1+k_1)b_1(x) \newline
+m_0=c_0+k_0 \newline
 m_1=c_1+k_1
 $$
 
@@ -704,9 +704,9 @@ $$
 Replacing our functions with our coefficients and basis functions we get:
 
 $$
-Af(x) \approx A(c_0b_0(x)+c_1b_1(x)) \\
-Af(x) \approx Ac_0b_0(x)+Ac_1b_1(x) \\
-m_0=Ac_0 \\
+Af(x) \approx A(c_0b_0(x)+c_1b_1(x)) \newline
+Af(x) \approx Ac_0b_0(x)+Ac_1b_1(x) \newline
+m_0=Ac_0 \newline
 m_1=Ac_1
 $$
 
