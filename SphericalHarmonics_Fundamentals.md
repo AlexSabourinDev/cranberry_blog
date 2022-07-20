@@ -294,7 +294,7 @@ Hopefully that provides some insight into the primary pieces of the spherical ha
 
 ### Practical Usage
 
-It's important to note, that $g(x) = c_0b_0(x) + c_1b_1(x) + c_2b_x(x) + ... + c_nb_n(x)$ is only true when $n=\infin$. As a result, many functions can only be reconstructed perfectly with an infinite number of coefficients.
+It's important to note, that $g(x) = c_0b_0(x) + c_1b_1(x) + c_2b_x(x) + ... + c_nb_n(x)$ is only true when $n=\infty$. As a result, many functions can only be reconstructed perfectly with an infinite number of coefficients.
 
 In practice, you'll only see a fixed number of coefficients (likely a pretty small number). In game rendering, you are likely to see 9 coefficients as a common number of terms used to represent irradiance (using spherical harmonics to represent irradiance is a very common use). 
 
