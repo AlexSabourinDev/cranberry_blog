@@ -576,7 +576,6 @@ Matching our derived normalization constant!
 <summary> Why do we need $\sqrt{2}$ in our normalization constant when $m \neq 0$?</summary>
 
 <blockquote>
-
 The reason we need $\sqrt{2}$ when $m \neq 0$ is relatively simple.
 
 Above, we used the property that
@@ -642,7 +641,7 @@ $$
 }
 $$
 
-But not only that the constant of a the product of a single function is $c$ but that in our case, the product is 1!
+But not only that the constant of the product of a single function is $c$ but that in our case, the product is 1!
 
 $$
 \int f_i(x)f_i(x)dx=1
