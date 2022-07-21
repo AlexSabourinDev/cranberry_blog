@@ -572,10 +572,11 @@ $$
 
 Matching our derived normalization constant!
 
-<details><blockquote>
+<details>
 
 <summary> Why do we need $\sqrt{2}$ in our normalization constant when $m \neq 0$** </summary>
 
+<blockquote>
 The reason we need $\sqrt{2}$ when $m \neq 0$ is relatively simple.
 
 Above, we used the property that
