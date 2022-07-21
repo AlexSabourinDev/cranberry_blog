@@ -501,7 +501,7 @@ $$
 When integrated across our sphere, should give us a value of
 
 $$
-(K_l^m)^2
+(\frac{1}{K_l^m})^2
 $$
 
 From now on - we will expand $K_l^m$ as
