@@ -573,7 +573,7 @@ $$
 Matching our derived normalization constant!
 
 <details>
-<summary> Why do we need $\sqrt{2}$ in our normalization constant when $m \neq 0$</summary>
+<summary> Why do we need $\sqrt{2}$ in our normalization constant when $m \neq 0$?</summary>
 
 <blockquote>
 
