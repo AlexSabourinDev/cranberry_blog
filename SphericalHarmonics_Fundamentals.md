@@ -573,10 +573,10 @@ $$
 Matching our derived normalization constant!
 
 <details>
-
-<summary> Why do we need $\sqrt{2}$ in our normalization constant when $m \neq 0$** </summary>
+<summary> Why do we need $\sqrt{2}$ in our normalization constant when $m \neq 0$</summary>
 
 <blockquote>
+
 The reason we need $\sqrt{2}$ when $m \neq 0$ is relatively simple.
 
 Above, we used the property that
@@ -622,7 +622,9 @@ You'll notice that we're missing a factor of 2 from this integral as opposed to 
 
 However, our original normalization constant was written with the expectation that we would have a factor of $2\pi$. As a result, 	we need to reintroduce this factor as a new constant. (As a square root here because of the formulation of our normalization 	constant as explained above)
 
-</details> </blockquote>
+</blockquote>
+
+</details> 
 
 To recap these results, we can show that
 
