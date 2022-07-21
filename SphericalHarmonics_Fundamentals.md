@@ -444,7 +444,7 @@ Fear not! Some very smart people have already figured this out and we finally ge
 
 What is it?
 
-<img src="SphericalHarmonics_Fundamentals_Assets/NormalizationConstant.PNG" alt="NormalizationConstant" style="zoom:600%;" />
+<img src="SphericalHarmonics_Fundamentals_Assets/NormalizationConstant.PNG" alt="NormalizationConstant" style="zoom:100%;" />
 
 Our normalization constant!
 
