@@ -162,6 +162,8 @@ Tada! We've moved from our function to constants for our basis and back.
 
 **Question:** Unfortunately, I'm not familiar with where this normalization constant comes from and why we have to use it here. If you happen to know, please reach out. I would be very happy to be enlightened and will happily amend this section with that information.
 
+**Edit:** It seems likely that the normalization constant can be derived by following the steps outlined in at this [website](https://planetmath.org/derivationoffouriercoefficients1). I haven't done the derivation myself - but I will run with this theory for now.
+
 You'll notice that with our original functions above $b_0(x)=\frac{1}{2}x, b_1(x)=x$ we can't simply multiply our coefficients by a normalization constant to reconstruct our $\frac{1}{4}$ term (No constant value can remove the $x$ term!).
 
 Now that we've defined orthogonal basis functions, here is a sample of the first few basis functions for our spherical harmonics
@@ -782,7 +784,6 @@ If you're interested in visualizing and playing with the various pieces describe
 
 As presented throughout the post, I am left with some lingering questions. If you happen to have insights about them, please reach out!
 
-* I'm not familiar with where the normalization constant for the Associated Legendre Polynomials comes from and why we have to use it here. If you happen to know, please reach out.
 * I'm not quite sure why we use the Associated Legendre Polynomials for spherical harmonics. Could we perhaps have used a Fourier Series instead? Is there any benefit to the use of this basis instead of another in graphics programming?
 
 This is a bit of an experimental approach to a blog post. Hopefully this was easy to read and navigate.
@@ -798,3 +799,5 @@ Bye!
 [3] https://patapom.com/blog/SHPortal/
 
 [4] https://www.ppsloan.org/publications/StupidSH36.pdf
+      
+[5] https://planetmath.org/derivationoffouriercoefficients1
