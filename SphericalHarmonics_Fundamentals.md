@@ -395,7 +395,7 @@ $$
 Expanding our new polynomial
 
 $$
-\int f(x)g(x)dx \approx \int (k_0c_0*b_0(x)^2+2k_0c_1*b_0(x)b_1(x)+c_1k_1*b_1(x)^2)dx
+\int f(x)g(x)dx \approx \int (k_0c_0b_0(x)^2+2k_0c_1b_0(x)b_1(x)+c_1 k_1b_1(x)^2)dx
 $$
 
 Distributing our integral
