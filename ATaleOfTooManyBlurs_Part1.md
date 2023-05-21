@@ -125,9 +125,7 @@ With these modifications, our timings come out as:
 
 Notice that we only really measure benefits for 128 Bits/Pixel in our use case.
 
-This has a relatively intuitive reasoning. In our particular case, our blur kernel is pretty small. This means we don't really access that much memory in the first place.
-
-As a result, we don't necessarily evict that much memory from cache in the first place.
+This has a relatively intuitive reasoning. In our particular case, our blur kernel is pretty small. As a result, we don't necessarily evict that much memory from cache in the first place. Larger Bits/Pixel force us to make less effective use of our cache, opening the door for our Z-Curves to optimize.
 
 ### Rules Of Thumb
 
