@@ -30,13 +30,13 @@ A two-dimensional blur of radius `NxN`.
 
 In essence, to write a two dimensional blur, we simply need to read the `NxN` neighbourhood of our current pixel and apply a weight to each neighbour.
 
-![](ATaleOfTooManyBlurs_Assets/Blur3x3.png)
+![](ATaleOfTooManyBlurs_Assets/Blur3x3.jpg)
 
 The weight that we apply depends on the type of blur we want to use.
 
 For this case, let's use a 3x3 box blur where each weight has the same value (in this case, this would be 0.11111111111111111)
 
-![](ATaleOfTooManyBlurs_Assets/BoxBlur3x3.png)
+![](ATaleOfTooManyBlurs_Assets/BoxBlur3x3.jpg)
 
 A basic 3x3 box blur shader could look like this:
 
