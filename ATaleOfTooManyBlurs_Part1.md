@@ -30,7 +30,7 @@ A two-dimensional blur of radius `NxN`.
 
 In essence, to write a two dimensional blur, we simply need to read the `NxN` neighbourhood of our current pixel and apply a weight to each neighbour.
 
-![](ATaleOfTooManyBlurs_Assets/Test.png)
+![](ATaleOfTooManyBlurs_Assets/Blur3x3.png)
 
 The weight that we apply depends on the type of blur we want to use.
 
