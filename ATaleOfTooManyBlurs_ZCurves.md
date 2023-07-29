@@ -1,4 +1,4 @@
-# A Tale Of Too Many Blurs - Part 1
+# A Tale Of Too Many Blurs (1/?) - Morton/Z Curves
 
 ![](ATaleOfTooManyBlurs_Assets/BluryBlur.png)
 
@@ -54,7 +54,7 @@ void boxBlurCS(uint3 dispatchId : SV_DispatchThreadID)
     };
 
 	float4 blur = 0.0f;
-	for(uint i = 0; i < blurOffsetCount; i+=4)
+	for(uint i = 0; i < blurOffsetCount; i++)
 	{
         int2 readIndex = clamp((int2)dispatchId.xy + blurOffsets[i],
             int2(0, 0), int2(BlurConstants.SourceWidth - 1, BlurConstants.SourceHeight - 1));
@@ -71,7 +71,7 @@ With this basic shader, we can already optimize it without any algorithmic modif
 
 Let's start off by gathering statistics on this simple blur.
 
-For a 4096x4096 texture at bits per pixel, our timings come out as:
+For a 4096x4096 texture at various bits per pixel, our timings come out as:
 
 ```
 32 Bits/Pixel: 0.17ms
@@ -197,7 +197,7 @@ y = ((index >> 1) & 0x0003) | (((index >> 3) & 0x0007) & 0xFFFC)
 
 What I find interesting here, is that this ordering is slightly more nuanced than the naive Z Order curve.
 
-Instead of recursively applying the same "Z pattern" at each level which would result in needing to pack every even bit/odd bit they apply a pattern that rotates the pattern at each level (Imagine that we do a horizontal Z and then a vertical Z).
+Instead of recursively applying the same "Z pattern" at each level which would result in needing to pack every even/odd bit, they apply a pattern that rotates the pattern at each level (Imagine that we do a horizontal Z and then a vertical Z).
 
 This implies that instead of our masks for our 2D coordinate being:
 
