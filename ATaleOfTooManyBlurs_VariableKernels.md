@@ -148,9 +148,185 @@ And finally, you can see that with a tiny `3x3` blur, our `NxN` shader is actual
 
 Something you might observe if you investigate the behaviour of your blur, is that you might notice that each texel actually does quite a bit of sharing with its neighbours!
 
-TODO: Groupshared
+Lets look at an example.
+
+If we look at the first row of our example grid, we can see that we have multiple overlapping blurs.
+
+![](ATaleOfTooManyBlurs_Assets/Sharing_01.png)
+
+![](ATaleOfTooManyBlurs_Assets/Sharing_02.png)
+
+Out of the 6 total values we're using in this row, 4 are shared!
+
+This suggests that our compute shader will actually share a large portion of its samples with its neighbours. If we were able to capitalize on this sharing, we could potentially gain some performance by avoiding some redundant memory loads between threads!
+
+The idea for this optimization is relatively simple.
+
+We want to load a whole row of values before doing our blur on those values.
+
+![](ATaleOfTooManyBlurs_Assets/Sharing_03.png)
+
+A row of values used by a threadgroup in our shader is simply the width of our threadgroup + two of our blur radius worth of values.
+
+![](ATaleOfTooManyBlurs_Assets/Sharing_04.png)
+
+To load these rows, we simply have our threadgroup "sweep" accross our row to load all the values we need:
+
+![](ATaleOfTooManyBlurs_Assets/Sharing_05.png)
+
+![](ATaleOfTooManyBlurs_Assets/Sharing_06.png)
+
+A horizontal version of that loading can look like this:
+
+```
+static uint const MaxCacheWidth = BlurThreadGroupWidth + MaxBlurRadius * 2; // Groupshared needs a maximum size
+groupshared float4 TexelCache[MaxCacheWidth * BlurThreadGroupHeight];
+
+void loadGroupSharedCache(uint2 threadGroupId, uint2 threadGroupOrigin)
+{
+	uint blurRadius = BlurConstants.BlurRadius;
+
+    // Offset our starting position by the samples that we loaded at the edge
+	int2 loadOrigin = (int2)threadGroupOrigin-int2(blurRadius, 0);
+	uint loadWidth = (BlurThreadGroupWidth + blurRadius * 2);
+	for(uint i = 0; i < loadWidth; i += BlurThreadGroupWidth)
+	{
+		uint2 cacheIndex2D = threadGroupId + uint2(i, 0);
+		bool writeValid = cacheIndex2D.x < loadWidth;
+
+		[branch]
+		if(writeValid)
+		{
+			int2 readIndex = loadOrigin + (int2)cacheIndex2D;
+			readIndex = clamp(readIndex,
+				int2(0,0), int2(BlurConstants.SourceWidth-1, BlurConstants.SourceHeight-1));
+
+			uint cacheIndex = cacheIndex2D.x * BlurThreadGroupWidth + cacheIndex2D.y;
+			TexelCache[cacheIndex] = Source[readIndex];
+		}
+	}
+}
+```
+
+Then, instead of reading from our texture in our blur loop, we simply read from groupshared.
+
+```
+// Offset our starting position by the samples that we loaded at the edge
+int2 readIndex = int2(threadGroupId.xy) + int2(BlurConstants.BlurRadius, 0);
+for(uint i = 0; i < BlurConstants.SampleCount; i++)
+{
+    int2 cacheIndex2D = readIndex + SimpleSamples[i].Offset;
+    uint cacheIndex = cacheIndex2D.x * BlurThreadGroupWidth + cacheIndex2D.y;
+    blur += Texel1DCache[cacheIndex] * SimpleSamples[i].Weight;
+}
+```
+
+### Benefits
+
+- Reduces the amount of memory loads needed for our blurs. Works best for textures that have large bits per-pixel. (Largest gains observed at 128bpp)
+
+### Downsides
+
+- Code complexity goes up pretty substantially.
+- Not necessarily a win when your texture has small bits per-pixel. You're betting on beating your cache here. Should profile for your use case.
+- Groupshared usage can become an occupancy limiter, causing your wave occupancy to completely ruin your potential performance benefits from the reduced memory usage.
+- Small blur radii will not benefit much (or at all) from this optimization since there's minimal sharing and the likelihood that your values are already in cache is high.
+
+### Results!
+
+At 128 bits per pixel, we see some pretty notable gains as we get to larger blur radii
+
+|Blur Width|Baseline |Separable|Separable GS|
+|----------|---------|---------|------------|
+|3         |0.744581 |0.823921 |1.024737    |
+|5         |1.618009 |0.89465  |1.088424    |
+|7         |3.494337 |1.022361 |1.138952    |
+|9         |5.339948 |1.190535 |1.181699    |
+|11        |8.531198 |1.468928 |1.30515     |
+|13        |11.406805|1.685162 |1.453065    |
+|15        |16.068599|1.978939 |1.591545    |
+|17        |20.050658|2.199567 |1.71825     |
+|19        |25.845276|2.500237 |1.874632    |
+
+![](ATaleOfTooManyBlurs_Assets/SeparableVariableGS_128bpp.png)
+
+(Removed baseline `NxN` since it obscures the results by being sooooo slowwwwww)
+
+At 32 bits per pixel, the picture looks quite a bit different
+
+|Blur Width|Baseline |Separable|Separable GS|
+|----------|---------|---------|------------|
+|3         |0.384534 |0.423505 |0.63749     |
+|5         |0.876196 |0.464511 |0.645974    |
+|7         |1.673333 |0.591145 |0.702051    |
+|9         |2.739451 |0.69224  |0.781162    |
+|11        |4.094507 |0.823114 |0.905879    |
+|13        |5.704834 |0.950053 |1.031964    |
+|15        |7.592824 |1.093117 |1.161989    |
+|17        |9.76564  |1.221598 |1.291576    |
+|19        |12.218537|1.358348 |1.424937    |
+
+![](ATaleOfTooManyBlurs_Assets/SeparableVariableGS_32bpp.png)
+
+As you can see, our groupshared usage is just overhead and it doesn't seem like we'll catch up to our simple separable blur anytime soon.
+
+### Implementation Guidelines
+
+To reduce your groupshared pressure, instead of dispatching a symmetrical `NxN` threagroup, consider dispatching an assymetrical `NxM` threadgroup.
+
+Since we only need extra space at the edges of our one dimensional threadgroup
+
+![](ATaleOfTooManyBlurs_Assets/Sharing_04.png)
+
+Groupshared usage grows by `M` for each extra thread along our X axis but it grows by `N + 2 * Radius` for every extra thread along our Y axis.
+
+As an example, if we have a 16x16 threadgroup and a MaxRadius of 8, our baseline groupshared size will be `(16+8*2)*16=512`.
+
+Adding an extra thread along the X axis will give us a groupshared size of `(17+8*2)*16=528`.
+
+However, adding an extra thread along the Y axis will give us a groupshared size of `(16+8*2)*17=544`!
+
+For my use case on an RTX 3070 Ti, I found that a threadgroup size of `256x1` provided the best performance results but your mileage may vary.
+
+### What About 2D?
+
+As a small bonus, here are some of our statistics if you use groupshared to reduce your 2D shared sample overhead.
+
+#### 32 Bits/Pixel
+
+|Width|2D       |2D GS   |
+|-----|---------|--------|
+|3    |0.384534 |0.495603|
+|5    |0.876196 |0.800146|
+|7    |1.673333 |1.3197  |
+|9    |2.739451 |2.029441|
+|11   |4.094507 |2.908494|
+|13   |5.704834 |3.962525|
+|15   |7.592824 |5.222837|
+|17   |9.76564  |6.633407|
+|19   |12.218537|8.354483|
+
+#### 128 Bits/Pixel
+
+|Width|2D       |2D GS   |
+|-----|---------|--------|
+|3    |0.732132 |1.312892|
+|5    |1.634236 |1.722673|
+|7    |3.479287 |2.731621|
+|9    |5.315822 |3.8853  |
+|11   |8.482962 |5.549286|
+|13   |11.364633|7.392646|
+|15   |16.04207 |9.651219|
+|17   |20.162963|12.09669|
+|19   |25.694907|15.50847|
 
 ## Conclusion
+
+As you can see, figuring out if your blur is separable can net you some excellent savings for very little work!
+
+You can then extend that idea using groupshared memory to reduce your overall memory pressure! However, as we saw, its not necessarily a clear win if your data and situation can't benefit from this optimization.
+
+In the next part of this series, we'll be touching on the most complex of our blurs. The sliding window blur and its hyper-complex form, the inline sliding window blur!
 
 See you next time!
 
@@ -161,3 +337,5 @@ See you next time!
 TODO: Inline separable
 
 ## References
+
+[1] [Optimizing GPU occupancy and resource usage with large thread groups](https://gpuopen.com/learn/optimizing-gpu-occupancy-resource-usage-large-thread-groups/)
