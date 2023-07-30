@@ -1,4 +1,4 @@
-# A Tale Of Too Many Blurs (2/?) - 
+# A Tale Of Too Many Blurs (2/?) - Separable Kernels
 
 ![](ATaleOfTooManyBlurs_Assets/BluryBlur.png)
 
