@@ -324,9 +324,9 @@ As a small bonus, here are some of our statistics if you use groupshared to redu
 
 As you can see, figuring out if your blur is separable can net you some excellent savings for very little work!
 
-You can then extend that idea using groupshared memory to reduce your overall memory pressure! However, as we saw, its not necessarily a clear win if your data and situation can't benefit from this optimization.
+You can then extend that idea using groupshared memory to reduce your overall memory pressure. However, as we saw, its not necessarily a clear win if your data and situation can't benefit from this optimization.
 
-In the next part of this series, we'll be touching on the most complex of our blurs. The sliding window blur and its hyper-complex form, the inline sliding window blur!
+In the next part of this series, we'll be touching on the most complex of our blurs. The sliding window blur and its hyper-complex form, the inline sliding window blur.
 
 See you next time!
 
@@ -334,7 +334,88 @@ See you next time!
 
 ### Appendix A - Inline Separable Blurs
 
-TODO: Inline separable
+Despite its numerous advantages, a side effect you may run into with a two pass separable filter is the overhead from having to write back to global memory overshadows the benefits of doing less work overall.
+
+One approach you can explore, is to separate your blur kernel within itself and to use groupshared memory as your intermediate buffer.
+
+Lets look at a 3x3 separable filter as an example.
+
+If we start with the second pass, we see that we apply a vertical filter that uses the results of 3 of our previous horizontal filters.
+
+Vertical Pass:
+
+![](ATaleOfTooManyBlurs_Assets/InlineSeparable_01.png)
+
+Source Horizontal Pass:
+
+![](ATaleOfTooManyBlurs_Assets/InlineSeparable_02.png)
+
+What we can observe, is that we simply need to store the results of the horizontal filter that we'll use in our vertical pass as part of our groupshared memory.
+
+The code to write this is unfortunately fairly complicated - so we'll simply write it out in pseudo code here.;
+
+```
+groupshared float HorizontalPassResults[CacheSize];
+
+void blurCS()
+{
+	HorizontalPassResults = doHorizontalBlur(SourceTexture);
+	GroupMemoryBarrierWithGroupSync();
+	OutputTexture = doVerticalBlur(HorizontalPassResults);
+}
+```
+
+There's a few implementation choices here.
+
+You could implement your horizontal blur as a groupshared 1D blur, which means that we need additional groupshared memory.
+
+Or we could implement it as a simple 1D blur without any groupshared memory usage.
+
+At this stage, you may start running into a variety of tradeoffs.
+
+If we decide to use groupshared memory for our horizontal pass, our groupshared pressure grows pretty dramatically, potentially limiting our occupancy, reducing our overall performance.
+
+However, if we decide to avoid using groupshared memory, we start running into potential memory bandwidth issues from our increased memory pressure since we're not using groupshared memory to share our memory loads between threads.
+
+In my profiling, avoiding using groupshared memory in the horizontal pass allows us to avoid over subscribing to groupshared memory which has a dramatic impact on our occupancy and as a result our performance.
+
+Here are the results without using groupshared in our horizontal pass compared to our groupshared separable filter and our 2D filter at 128 bits per pixel.
+
+|Width|2D       |Separable GS|Inline Separable|
+|-----|---------|------------|----------------|
+|3    |0.735148 |1.025647    |0.636752        |
+|5    |1.62365  |1.094989    |0.743439        |
+|7    |3.527865 |1.138704    |0.864819        |
+|9    |5.391209 |1.184832    |1.106415        |
+|11   |8.637562 |1.309818    |1.322269        |
+|13   |11.549441|1.453382    |1.628811        |
+|15   |16.304226|1.594083    |1.818722        |
+|17   |20.257372|1.717389    |2.070729        |
+|19   |26.159442|1.882339    |2.351704        |
+
+![](ATaleOfTooManyBlurs_Assets/InlineSeparable_128bpp.png)
+
+Here are the results with groupshared for our horizontal pass.
+
+|Width|2D       |Separable GS|Inline Separable GS|
+|-----|---------|------------|-------------------|
+|3    |0.735148 |1.025647    |1.45678            |
+|5    |1.62365  |1.094989    |1.619394           |
+|7    |3.527865 |1.138704    |1.860834           |
+|9    |5.391209 |1.184832    |2.171378           |
+|11   |8.637562 |1.309818    |2.483697           |
+|13   |11.549441|1.453382    |2.776213           |
+|15   |16.304226|1.594083    |3.078972           |
+|17   |20.257372|1.717389    |3.415786           |
+|19   |26.159442|1.882339    |4.849435           |
+
+![](ATaleOfTooManyBlurs_Assets/InlineSeparable_128bpp_02.png)
+
+As you can see, when we attempt to also make use of groupshared memory for our horizontal pass, we end up with substantially lower performance than our baseline pass with our use case.
+
+The primary cause of this performance regression is due to our substantial groupshared memory usage which has a severe impact on our occupancy.
+
+If you're willing to store your intermediate values in groupshared at reduced precision (half precision or even 8 bits) in order to reduce the size of your intermediate cache, then you can likely improve these results.
 
 ## References
 
