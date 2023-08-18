@@ -2,7 +2,7 @@
 
 ![](ATaleOfTooManyBlurs_Assets/BluryBlur.png)
 
-In our previous [post](ATaleOfTooManyBlurs_ZCurves.md) - we explored a simple 3x3 fixed blur kernel.
+In our previous [post](ATaleOfTooManyBlurs_Part1_ZCurves.md) - we explored a simple 3x3 fixed blur kernel.
 
 In this post, we're going to explore some approaches to optimizing a variable sized blur kernel.
 
@@ -320,19 +320,7 @@ As a small bonus, here are some of our statistics if you use groupshared to redu
 |17   |20.162963|12.09669|
 |19   |25.694907|15.50847|
 
-## Conclusion
-
-As you can see, figuring out if your blur is separable can net you some excellent savings for very little work!
-
-You can then extend that idea using groupshared memory to reduce your overall memory pressure. However, as we saw, its not necessarily a clear win if your data and situation can't benefit from this optimization.
-
-In the next part of this series, we'll be touching on the most complex of our blurs. The sliding window blur and its hyper-complex form, the inline sliding window blur.
-
-See you next time!
-
-## Appendices
-
-### Appendix A - Inline Separable Blurs
+## Inline Separable Blurs
 
 Despite its numerous advantages, a side effect you may run into with a two pass separable filter is the overhead from having to write back to global memory overshadows the benefits of doing less work overall.
 
@@ -416,6 +404,16 @@ As you can see, when we attempt to also make use of groupshared memory for our h
 The primary cause of this performance regression is due to our substantial groupshared memory usage which has a severe impact on our occupancy.
 
 If you're willing to store your intermediate values in groupshared at reduced precision (half precision or even 8 bits) in order to reduce the size of your intermediate cache, then you can likely improve these results.
+
+## Conclusion
+
+As you can see, figuring out if your blur is separable can net you some excellent savings for very little work!
+
+You can then extend that idea using groupshared memory to reduce your overall memory pressure. However, as we saw, its not necessarily a clear win if your data and situation can't benefit from this optimization.
+
+In the next part of this series, we'll be touching on the most complex of our blurs. The sliding window blur and its hyper-complex form, the inline sliding window blur.
+
+See you next time!
 
 ## References
 
