@@ -231,6 +231,7 @@ for(uint i = 0; i < BlurConstants.SampleCount; i++)
 - Not necessarily a win when your texture has small bits per-pixel. You're betting on beating your cache here. Should profile for your use case.
 - Groupshared usage can become an occupancy limiter, causing your wave occupancy to completely ruin your potential performance benefits from the reduced memory usage.
 - Small blur radii will not benefit much (or at all) from this optimization since there's minimal sharing and the likelihood that your values are already in cache is high.
+- The larger your maximum radius, the more groupshared memory you end up using which will impact your occupancy!
 
 ### Results!
 

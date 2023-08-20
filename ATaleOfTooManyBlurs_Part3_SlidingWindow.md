@@ -176,14 +176,126 @@ These columns will double your threadcount at the cost of some extra redundant t
 
 YES!
 
+At this point - things are pretty darn fast.
+
+But one of our bottlenecks is the write back to global memory in order to run the second pass on our one dimensional blur.
+
+What we can do, is we can use the same ideas we presented in the inline separable filter in the previous post.
+
+Instead of having our sliding window blur horizontally and then blur vertically, we would run a horizontal pass within our threadgroup and cache those results into our vertical sliding window buffer.
+
+First we do oa horizontal blur for each element that we need and store it in our groupshared cache.
+
+![](ATaleOfTooManyBlurs_Assets/InlineSlidingWindow_01.png)
+
+![](ATaleOfTooManyBlurs_Assets/InlineSlidingWindow_02.png)
+
+![](ATaleOfTooManyBlurs_Assets/InlineSlidingWindow_03.png)
+
+And then we blur it vertically!
+
+![](ATaleOfTooManyBlurs_Assets/InlineSlidingWindow_04.png)
+
+Finally, we evict our unneeded rows and calculate our next horizontal blurs and repeat the process!
+
+![](ATaleOfTooManyBlurs_Assets/InlineSlidingWindow_05.png)
+
+![](ATaleOfTooManyBlurs_Assets/InlineSlidingWindow_06.png)
+
+### Implementation Guidelines
+
+#### Groupshared Horizontal Cache
+
+For your horizontal pass, you can use groupshared memory to reduce the amount of memory you're loading across your threads. Following the approach we saw in our separable groupshared shader.
+
+However, you run into the risk of over subscribing to groupshared memory which will reduce your overall occupancy and as a result negatively impact your performance.
+
+In this case there's a few options you can consider:
+
+- Don't use groupshared memory for your horizontal pass.
+- Store your results as halfs instead of as floats.
+
+#### Limited Threads In-flight
+
+Similarly to our discussion above on the separable sliding window blur, you may not have enough threads in flight to fully hide your occupancy and maximize parallelism.
+
+You can follow the same idea described above with this implementation as well.
+
+Spawn a series of vertical groups instead of having a single group run across the whole texture. In my experimentation, for a 2k texture, 8 groups provided the best results.
+
+### Results!
+
+If we look at a variant where we don't make use of groupshared memory for our horizontal blurs, we have a pretty substantial advantage over our original sliding window implementation until our memory pressure from our horizontal memory loads catch up to us.
+
+![](ATaleOfTooManyBlurs_Assets/InlineSlidingWindow_128bpp.png)
+
+|Width|2D       |Separable|Sliding Window|Inline Sliding Window|
+|-----|---------|---------|--------------|---------------------|
+|3    |0.735148 |0.821471 |0.957298      |0.558391             |
+|5    |1.62365  |0.901881 |1.023394      |0.687429             |
+|7    |3.527865 |1.02799  |1.086498      |0.763222             |
+|9    |5.391209 |1.214321 |1.168042      |0.979133             |
+|11   |8.637562 |1.492953 |1.226717      |1.099264             |
+|13   |11.549441|1.702914 |1.300704      |1.318707             |
+|15   |16.304226|1.993194 |1.38043       |1.427177             |
+|17   |20.257372|2.233709 |1.532896      |1.646994             |
+|19   |26.159442|2.549869 |1.647792      |1.748748             |
+
+If we try to make use of groupshared memory to cache our horizontal loads, we run into a bit of a problem...
+
+![](ATaleOfTooManyBlurs_Assets/InlineSlidingWindowHorizontal_128bpp.png)
+
+It's frequently slower!
+
+## What About Using Halfs?
+
+Across all of these implementations that make use of groupshared memory, we've used 32 bit precision floating point as our storage format for our groupshared memory.
+
+This can cause our occupancy to be substantially reduced since we may end up running out of groupshared memory before we can schedule enough threadgroups to saturate our GPU.
+
+What if we use halfs for our groupshared storage instead?
+
+This means that we're going to trade some performance for accuracy in our kernel.
+
+This may be a tradeoff you're willing to make!
+
+The results may definitely be worth it.
+
+![](ATaleOfTooManyBlurs_Assets/InlineSlidingWindowHalf_128bpp.png)
+
+|2D |Separable|Sliding Window|Inline Sliding Window|Inline Sliding Window Horizontal GS|
+|---|---------|--------------|---------------------|-----------------------------------|
+|0.735148|0.821471 |0.95507       |0.56043              |0.560252                           |
+|1.62365|0.901881 |1.019913      |0.664463             |0.614856                           |
+|3.527865|1.02799  |1.086602      |0.737345             |0.692119                           |
+|5.391209|1.214321 |1.175109      |0.966387             |0.824544                           |
+|8.637562|1.492953 |1.240839      |1.057926             |0.927536                           |
+|11.549441|1.702914 |1.327034      |1.29001              |1.074878                           |
+|16.304226|1.993194 |1.435602      |1.38181              |1.177938                           |
+|20.257372|2.233709 |1.603783      |1.625542             |1.325587                           |
+|26.159442|2.549869 |1.721762      |1.718722             |1.477609                           |
+
+Our pass with groupshared caching for our horizontal pass now consistently beats all of our other passes!
+
 ## Conclusion
 
+Hopefully this treatment on blurs has been instructive! 
 
-See you next time!
+I think this is where I'm going to wrap it up.
+
+I intended to touch on the benefits of packing your sample offset information (store your weights as halves and pack your offsets) as well as what type of storage to use to store your offsets (use constant buffers if you can, they're consistently fast) but I think I'm done with this series.
+
+Hopefully this was as insightful for you as it was for me!
 
 ## Appendices
 
-### Appendix A
+### Appendix A - A Thorough Breakdown Of Our Results
+
+Lets look at our results across a variety of texture resolutions and bits per-pixel.
+
+We're going to compare our performance using the `half`-based groupshared storage since I think that's the most practical one.
+
+// TODO: Do all texture resolutions/bits-per-pixel
 
 ## References
 
