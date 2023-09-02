@@ -277,11 +277,23 @@ The results may definitely be worth it.
 
 Our inline sliding window with groupshared caching for our horizontal pass now consistently beats all of our other blurs!
 
+### Benefits
+
+- Substantially reduces the amount of memory loads needed for our blurs. Works best for textures that have large bits per-pixel. (Largest gains observed at 128bpp)
+- Unlike our separable groupshared blur, also works well with small blur radii.
+- Consistently good performance. Doesn't always outperform our other variants, but remains competitive throughout.
+
+### Downsides
+
+- Code complexity goes through the roof.
+- Groupshared usage quickly becomes an occupancy limiter.
+- The larger your maximum radius, the more groupshared memory you end up using.
+
 ## Conclusion
 
 Alright! I think this is where I'm going to wrap it up.
 
-I intended to touch on the benefits of packing your sample offset information (store your weights as halves and pack your offsets) as well as what type of storage to use to store your offsets (use constant buffers if you can, they're consistently fast) but I think I'm done with this series.
+I intended to touch on the benefits of packing your sample offset information (store your weights as halves and pack your offsets), what type of storage to use to store your offsets (use constant buffers if you can, they're consistently fast) and groupshared bank conflicts but I think I'm done with this series.
 
 Some sample shaders have been provided for further reference.
 
