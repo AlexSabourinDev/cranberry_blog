@@ -17,8 +17,8 @@ For our use case, we'll simply start with a `StructuredBuffer` of `M` samples an
 ```
 struct SimpleSample
 {
-	int2 Offset;
-	float Weight;
+    int2 Offset;
+    float Weight;
 };
 
 StructuredBuffer<SimpleSample> SimpleSamples;
@@ -184,27 +184,27 @@ groupshared float4 TexelCache[MaxCacheWidth * BlurThreadGroupHeight];
 
 void loadGroupSharedCache(uint2 threadGroupId, uint2 threadGroupOrigin)
 {
-	uint blurRadius = BlurConstants.BlurRadius;
+    uint blurRadius = BlurConstants.BlurRadius;
 
     // Offset our starting position by the samples that we loaded at the edge
-	int2 loadOrigin = (int2)threadGroupOrigin-int2(blurRadius, 0);
-	uint loadWidth = (BlurThreadGroupWidth + blurRadius * 2);
-	for(uint i = 0; i < loadWidth; i += BlurThreadGroupWidth)
-	{
-		uint2 cacheIndex2D = threadGroupId + uint2(i, 0);
-		bool writeValid = cacheIndex2D.x < loadWidth;
+    int2 loadOrigin = (int2)threadGroupOrigin-int2(blurRadius, 0);
+    uint loadWidth = (BlurThreadGroupWidth + blurRadius * 2);
+    for(uint i = 0; i < loadWidth; i += BlurThreadGroupWidth)
+    {
+        uint2 cacheIndex2D = threadGroupId + uint2(i, 0);
+        bool writeValid = cacheIndex2D.x < loadWidth;
 
-		[branch]
-		if(writeValid)
-		{
-			int2 readIndex = loadOrigin + (int2)cacheIndex2D;
-			readIndex = clamp(readIndex,
-				int2(0,0), int2(BlurConstants.SourceWidth-1, BlurConstants.SourceHeight-1));
+        [branch]
+        if(writeValid)
+        {
+            int2 readIndex = loadOrigin + (int2)cacheIndex2D;
+            readIndex = clamp(readIndex,
+                int2(0,0), int2(BlurConstants.SourceWidth-1, BlurConstants.SourceHeight-1));
 
-			uint cacheIndex = cacheIndex2D.x * BlurThreadGroupWidth + cacheIndex2D.y;
-			TexelCache[cacheIndex] = Source[readIndex];
-		}
-	}
+            uint cacheIndex = cacheIndex2D.x * BlurThreadGroupWidth + cacheIndex2D.y;
+            TexelCache[cacheIndex] = Source[readIndex];
+        }
+    }
 }
 ```
 
@@ -348,9 +348,9 @@ groupshared float HorizontalPassResults[CacheSize];
 
 void blurCS()
 {
-	HorizontalPassResults = doHorizontalBlur(SourceTexture);
-	GroupMemoryBarrierWithGroupSync();
-	OutputTexture = doVerticalBlur(HorizontalPassResults);
+    HorizontalPassResults = doHorizontalBlur(SourceTexture);
+    GroupMemoryBarrierWithGroupSync();
+    OutputTexture = doVerticalBlur(HorizontalPassResults);
 }
 ```
 

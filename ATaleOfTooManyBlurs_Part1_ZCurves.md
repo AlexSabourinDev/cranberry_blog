@@ -53,15 +53,15 @@ void boxBlurCS(uint3 dispatchId : SV_DispatchThreadID)
         int2(-1,  1), int2( 0,  1), int2( 1,  1)
     };
 
-	float4 blur = 0.0f;
-	for(uint i = 0; i < blurOffsetCount; i++)
-	{
+    float4 blur = 0.0f;
+    for(uint i = 0; i < blurOffsetCount; i++)
+    {
         int2 readIndex = clamp((int2)dispatchId.xy + blurOffsets[i],
             int2(0, 0), int2(BlurConstants.SourceWidth - 1, BlurConstants.SourceHeight - 1));
         blur += Source[readIndex] * blurWeight;
-	}
+    }
 
-	Output[dispatchId.xy] = blur;
+    Output[dispatchId.xy] = blur;
 }
 ```
 
@@ -90,18 +90,18 @@ In order to implement a Z-Order curve, we can simply pack all of our even bits i
 ```
 uint packEvenBits16(uint value)
 {
-	value &= 0x55555555;
-	value |= (value >> 1);
-	value &= 0x33333333;
-	value |= (value >> 2);
-	value &= 0x0000000F; // Clamp to 15
+    value &= 0x55555555;
+    value |= (value >> 1);
+    value &= 0x33333333;
+    value |= (value >> 2);
+    value &= 0x0000000F; // Clamp to 15
 
-	return value;
+    return value;
 }
 
 uint2 zCurve16x16(uint index)
 {
-	return uint2(packEvenBits16(index), packEvenBits16(index >> 1));
+    return uint2(packEvenBits16(index), packEvenBits16(index >> 1));
 }
 ```
 
@@ -109,10 +109,10 @@ Using this is as simple as modifying our `dispatchId`.
 
 ```
 void blurCS(uint threadIndex : SV_GroupIndex,
-	uint2 groupId : SV_GroupID,
-	uint3 dispatchId : SV_DispatchThreadID)
+    uint2 groupId : SV_GroupID,
+    uint3 dispatchId : SV_DispatchThreadID)
 {
-	dispatchId.xy = zCurve16x16(threadIndex) + groupId * BlurThreadGroupWidth;
+    dispatchId.xy = zCurve16x16(threadIndex) + groupId * BlurThreadGroupWidth;
 ```
 
 With these modifications, our timings come out as:
@@ -173,19 +173,19 @@ We implement Z Order curves as bit packing of our even bits (for the first 8 bit
 ```
     // X
     x = index;
-	x &= 0x55555555;
-	x |= (x >> 1);
-	x &= 0x33333333;
-	x |= (x >> 2);
-	x &= 0x0000000F;
+    x &= 0x55555555;
+    x |= (x >> 1);
+    x &= 0x33333333;
+    x |= (x >> 2);
+    x &= 0x0000000F;
 
     // Y
     y = index >> 1;
-	y &= 0x55555555;
-	y |= (y >> 1);
-	y &= 0x33333333;
-	y |= (y >> 2);
-	y &= 0x0000000F;
+    y &= 0x55555555;
+    y |= (y >> 1);
+    y &= 0x33333333;
+    y |= (y >> 2);
+    y &= 0x0000000F;
 ```
 
 In [\[1\]][Link 1] - they implement Morton-like ordering for 8x8 blocks as:
