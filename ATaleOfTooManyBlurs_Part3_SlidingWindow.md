@@ -275,13 +275,11 @@ The results may definitely be worth it.
 |20.257372|2.233709 |1.603783      |1.625542             |1.325587                           |
 |26.159442|2.549869 |1.721762      |1.718722             |1.477609                           |
 
-Our pass with groupshared caching for our horizontal pass now consistently beats all of our other passes!
+Our inline sliding window with groupshared caching for our horizontal pass now consistently beats all of our other blurs!
 
 ## Conclusion
 
-Hopefully this treatment on blurs has been instructive! 
-
-I think this is where I'm going to wrap it up.
+Alright! I think this is where I'm going to wrap it up.
 
 I intended to touch on the benefits of packing your sample offset information (store your weights as halves and pack your offsets) as well as what type of storage to use to store your offsets (use constant buffers if you can, they're consistently fast) but I think I'm done with this series.
 
@@ -295,7 +293,49 @@ Lets look at our results across a variety of texture resolutions and bits per-pi
 
 We're going to compare our performance using the `half`-based groupshared storage since I think that's the most practical one.
 
-// TODO: Do all texture resolutions/bits-per-pixel
+#### 512x512
+
+![](ATaleOfTooManyBlurs_Assets/512x512_32_bits_pixel.png)
+
+![](ATaleOfTooManyBlurs_Assets/512x512_64_bits_pixel.png)
+
+![](ATaleOfTooManyBlurs_Assets/512x512_128_bits_pixel.png)
+
+#### 1024x1024
+
+![](ATaleOfTooManyBlurs_Assets/1024x1024_32_bits_pixel.png)
+
+![](ATaleOfTooManyBlurs_Assets/1024x1024_64_bits_pixel.png)
+
+![](ATaleOfTooManyBlurs_Assets/1024x1024_128_bits_pixel.png)
+
+#### 2048x2048
+
+![](ATaleOfTooManyBlurs_Assets/2048x2048_32_bits_pixel.png)
+
+![](ATaleOfTooManyBlurs_Assets/2048x2048_64_bits_pixel.png)
+
+![](ATaleOfTooManyBlurs_Assets/2048x2048_128_bits_pixel.png)
+
+#### 4096x4096
+
+![](ATaleOfTooManyBlurs_Assets/4096x4096_32_bits_pixel.png)
+
+![](ATaleOfTooManyBlurs_Assets/4096x4096_64_bits_pixel.png)
+
+![](ATaleOfTooManyBlurs_Assets/4096x4096_128_bits_pixel.png)
+
+### Appendix B - Stable Profiling
+
+By the end of writting this post, I ran into behaviour where my profiling results would start varying in surprising ways.
+
+It would start being dramatically faster for a larger blur width or having large spikes in slow downs.
+
+I subsequently ran into this repository that utilizes DX12's `SetStablePowerState` in order to stabilize results.
+
+https://github.com/LouisBavoil/SetStablePowerState
+
+If you find yourself profiling on PC, it might be worthwhile to explore using this or a similar utility to stabilize your GPU profiling results.
 
 ## References
 
