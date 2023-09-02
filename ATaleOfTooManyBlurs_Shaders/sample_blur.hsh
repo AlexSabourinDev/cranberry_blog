@@ -1,0 +1,151 @@
+#include "sample_blur.hlsl.h"
+#define USE_ZCURVE
+
+struct Sample
+{
+	int2 Offset;
+	half Weight;
+};
+
+Sample unpackSample(PackedBlurSample packedSample)
+{
+	Sample unpackedSample = (Sample)0;
+	unpackedSample.Offset.x = (int)(packedSample & 0xFF) - 128;
+	unpackedSample.Offset.y = (int)((packedSample >> 8) & 0xFF) - 128;
+	unpackedSample.Weight = (half)f16tof32(packedSample >> 16);
+
+	return unpackedSample;
+}
+
+#define CACHE_AS_HALF
+
+#if defined(TEXEL_FORMAT_FLOAT)
+static uint const TexelComponentCount = 1;
+typedef float TexelFormat;
+
+#ifdef CACHE_AS_HALF
+typedef half CacheFormat;
+#else
+typedef float CacheFormat;
+#endif
+
+#elif defined(TEXEL_FORMAT_FLOAT2)
+static uint const TexelComponentCount = 2;
+typedef float2 TexelFormat;
+
+#ifdef CACHE_AS_HALF
+typedef half2 CacheFormat;
+#else
+typedef float2 CacheFormat;
+#endif
+
+#elif defined(TEXEL_FORMAT_FLOAT3)
+static uint const TexelComponentCount = 3;
+typedef float3 TexelFormat;
+
+#ifdef CACHE_AS_HALF
+typedef half3 CacheFormat;
+#else
+typedef float3 CacheFormat;
+#endif
+
+#elif defined(TEXEL_FORMAT_FLOAT4)
+static uint const TexelComponentCount = 4;
+typedef float4 TexelFormat;
+
+#ifdef CACHE_AS_HALF
+typedef half4 CacheFormat;
+#else
+typedef float4 CacheFormat;
+#endif
+
+#else
+#error "Undefined texel format."
+#endif
+
+
+[[vk::binding(0)]] Texture2D<TexelFormat> Source;
+
+#if (MaxSampleCount % 4) != 0
+#error "MaxSampleCount must be a multiple of 4."
+#endif
+[[vk::binding(1)]] cbuffer SampleConstantBuffer { uint4 Samples[MaxSampleCount / 4]; }
+
+uint4 loadSample4(uint sampleIndex)
+{
+	return Samples[sampleIndex / 4];
+}
+
+[[vk::binding(2)]] RWTexture2D<TexelFormat> Output;
+
+[[vk::push_constant]] struct { uint SampleCount; int SourceWidth; int SourceHeight; int BlurRadius; } BlurConstants;
+
+uint packEvenBits16(uint value)
+{
+	value &= 0x55555555;
+	value |= (value >> 1);
+	value &= 0x33333333;
+	value |= (value >> 2);
+	value &= 0x0000000F; // Clamp to 15
+
+	// Full 16 bit packing ops.
+	/*value &= 0x0F0F0F0F;
+	value |= (value >> 4);
+	value &= 0x00FF00FF;
+	value |= (value >> 8);
+	value &= 0x0000FFFF;*/
+
+	return value;
+}
+
+uint packEvenBits256(uint value)
+{
+	value &= 0x55555555;
+	value |= (value >> 1);
+	value &= 0x33333333;
+	value |= (value >> 2);
+	value &= 0x0F0F0F0F;
+	value |= (value >> 4);
+	value &= 0x000000FF;
+	/*value &= 0x00FF00FF;
+	value |= (value >> 8);
+	value &= 0x0000FFFF;*/
+
+	return value;
+}
+
+uint2 rotatingZCurve16x16(uint index)
+{
+	uint2 v;
+	v.x = (index & 0x01)
+		| ((index >> 2) & 0x06)
+		| ((index >> 4) & 0x08); // This line is only necessary for larger than 8x8 blocks.
+
+	v.y = ((index >> 1) & 0x03)
+		| ((index >> 3) & 0x0C);
+
+	return v;
+}
+
+uint2 zCurve16x16(uint index)
+{
+	return uint2(packEvenBits16(index), packEvenBits16(index >> 1));
+}
+
+uint2 zCurve256x256(uint index)
+{
+	return uint2(packEvenBits256(index), packEvenBits256(index >> 1));
+}
+
+// Expecting width to be a constant.
+uint2 zCurve(uint index, uint width)
+{
+	if(width > 16)
+	{
+		return zCurve256x256(index);
+	}
+	else
+	{
+		return rotatingZCurve16x16(index);
+	}
+}
