@@ -283,6 +283,11 @@ Alright! I think this is where I'm going to wrap it up.
 
 I intended to touch on the benefits of packing your sample offset information (store your weights as halves and pack your offsets) as well as what type of storage to use to store your offsets (use constant buffers if you can, they're consistently fast) but I think I'm done with this series.
 
+Some sample shaders have been provided for further reference.
+
+- [Sliding Window Blur](ATaleOfTooManyBlurs_Shaders/sample_blur_1d_sliding_window.hlsl)
+- [Inline Sliding Window Blur](ATaleOfTooManyBlurs_Shaders/sample_blur_inline_sliding_window.hlsl)
+
 Hopefully this was as insightful for you as it was for me!
 
 ## Appendices

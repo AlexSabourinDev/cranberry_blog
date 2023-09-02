@@ -414,6 +414,13 @@ You can then extend that idea using groupshared memory to reduce your overall me
 
 In the next part of this series, we'll be touching on the most complex of our blurs. The sliding window blur and its hyper-complex form, the inline sliding window blur.
 
+Some sample shaders have been provided for further reference.
+
+- [Simple Blur (Used for 2D and separable)](ATaleOfTooManyBlurs_Shaders/sample_blur_simple.hlsl)
+- [2D Groupshared Blur](ATaleOfTooManyBlurs_Shaders/sample_blur_2d_groupshared.hlsl)
+- [Separable Groupshared Blur](ATaleOfTooManyBlurs_Shaders/sample_blur_1d_groupshared.hlsl)
+- [Inline Separable Blur](ATaleOfTooManyBlurs_Shaders/sample_blur_inline_groupshared.hlsl)
+
 See you next time!
 
 ## References
