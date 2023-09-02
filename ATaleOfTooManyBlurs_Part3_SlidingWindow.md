@@ -312,35 +312,35 @@ We're going to compare our performance using the `half`-based groupshared storag
 
 #### 512x512
 
-![](ATaleOfTooManyBlurs_Assets/512_32_bits_pixel.png)
+![](ATaleOfTooManyBlurs_Assets/512_32_Bits_Pixel.png)
 
-![](ATaleOfTooManyBlurs_Assets/512x512_64_bits_pixel.png)
+![](ATaleOfTooManyBlurs_Assets/512x512_64_Bits_Pixel.png)
 
-![](ATaleOfTooManyBlurs_Assets/512x512_128_bits_pixel.png)
+![](ATaleOfTooManyBlurs_Assets/512x512_128_Bits_Pixel.png)
 
 #### 1024x1024
 
-![](ATaleOfTooManyBlurs_Assets/1024x1024_32_bits_pixel.png)
+![](ATaleOfTooManyBlurs_Assets/1024x1024_32_Bits_Pixel.png)
 
-![](ATaleOfTooManyBlurs_Assets/1024x1024_64_bits_pixel.png)
+![](ATaleOfTooManyBlurs_Assets/1024x1024_64_Bits_Pixel.png)
 
-![](ATaleOfTooManyBlurs_Assets/1024x1024_128_bits_pixel.png)
+![](ATaleOfTooManyBlurs_Assets/1024x1024_128_Bits_Pixel.png)
 
 #### 2048x2048
 
-![](ATaleOfTooManyBlurs_Assets/2048x2048_32_bits_pixel.png)
+![](ATaleOfTooManyBlurs_Assets/2048x2048_32_Bits_Pixel.png)
 
-![](ATaleOfTooManyBlurs_Assets/2048x2048_64_bits_pixel.png)
+![](ATaleOfTooManyBlurs_Assets/2048x2048_64_Bits_Pixel.png)
 
-![](ATaleOfTooManyBlurs_Assets/2048x2048_128_bits_pixel.png)
+![](ATaleOfTooManyBlurs_Assets/2048x2048_128_Bits_Pixel.png)
 
 #### 4096x4096
 
-![](ATaleOfTooManyBlurs_Assets/4096x4096_32_bits_pixel.png)
+![](ATaleOfTooManyBlurs_Assets/4096x4096_32_Bits_Pixel.png)
 
-![](ATaleOfTooManyBlurs_Assets/4096x4096_64_bits_pixel.png)
+![](ATaleOfTooManyBlurs_Assets/4096x4096_64_Bits_Pixel.png)
 
-![](ATaleOfTooManyBlurs_Assets/4096x4096_128_bits_pixel.png)
+![](ATaleOfTooManyBlurs_Assets/4096x4096_128_Bits_Pixel.png)
 
 ### Appendix B - Stable Profiling
 
