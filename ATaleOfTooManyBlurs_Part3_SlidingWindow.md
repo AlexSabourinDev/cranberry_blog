@@ -312,7 +312,7 @@ We're going to compare our performance using the `half`-based groupshared storag
 
 #### 512x512
 
-![](ATaleOfTooManyBlurs_Assets/512_32_Bits_Pixel.png)
+![](ATaleOfTooManyBlurs_Assets/512x512_32_Bits_Pixel.png)
 
 ![](ATaleOfTooManyBlurs_Assets/512x512_64_Bits_Pixel.png)
 
