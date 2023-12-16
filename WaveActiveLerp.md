@@ -1,3 +1,5 @@
+![](WaveActiveLerp_Assets/Heading.PNG)
+
 # Interpolation Using Wave Intrinsics
 
 I've been meaning to write about this little utility function I discovered a few months ago but I keep getting distracted.
