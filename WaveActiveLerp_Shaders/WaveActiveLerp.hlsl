@@ -31,11 +31,11 @@ uint WaveGetLastLaneIndex()
 	uint4 ballot = WaveActiveBallot(true);
 	uint4 bits = firstbithigh(ballot); // Returns -1 (0xFFFFFFFF) if no bits set.
 	
-    // For reasons unclear to me, firstbithigh causes us to consider `bits` as a vector when compiling for RDNA
-    // This then causes us to generate a waterfall loop later on in WaveReadLaneAt :(
-    // Force scalarization here. See: https://godbolt.org/z/barT3rM3W
-    bits = WaveReadLaneFirst(bits);
-    bits = select(bits == 0xFFFFFFFF, 0, bits + uint4(0, 32, 64, 96));
+	// For reasons unclear to me, firstbithigh causes us to consider `bits` as a vector when compiling for RDNA
+	// This then causes us to generate a waterfall loop later on in WaveReadLaneAt :(
+	// Force scalarization here. See: https://godbolt.org/z/barT3rM3W
+	bits = WaveReadLaneFirst(bits);
+	bits = select(bits == 0xFFFFFFFF, 0, bits + uint4(0, 32, 64, 96));
 
 	return max(max(max(bits.x, bits.y), bits.z), bits.w);
 }
