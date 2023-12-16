@@ -23,7 +23,7 @@ uint ValueCount;
 float interpolation = 0.0f;
 for(uint i = 0; i < ValueCount; i++)
 {
-    interpolation = lerp(interpolation, Values[i].x, Values[i].y);
+	interpolation = lerp(interpolation, Values[i].x, Values[i].y);
 }
 ```
 
@@ -37,16 +37,16 @@ Now imagine that each value and interpolant is calculated for each lane in a wav
 void CS(uint3 dispatchId : SV_DispatchThreadId)
 {
 	float value = CalculateValue(dispatchId.x);
-    float interpolant = CalculateInterpolant(dispatchId.x);
+	float interpolant = CalculateInterpolant(dispatchId.x);
 
-    float interpolation = 0.0f;
-    for(uint i = 0; i < 32; i++)
-    {
-        interpolation = lerp(interpolation, WaveReadLaneAt(value, i), WaveReadLaneAt(interpolant, i));
-    }
+	float interpolation = 0.0f;
+	for(uint i = 0; i < 32; i++)
+	{
+		interpolation = lerp(interpolation, WaveReadLaneAt(value, i), WaveReadLaneAt(interpolant, i));
+	}
 
-    if(dispatchId.x == 0)
-        Output[0] = interpolation;
+	if(dispatchId.x == 0)
+		Output[0] = interpolation;
 }
 ```
 
@@ -62,8 +62,8 @@ Similarly, if we then repeat this operation, we get:
 
 ```
 lerp(lerp(x0, x1, t1), x2, t2)
-    = (x0*(1-t1) + x1*t1)*(1-t2) + x2*t2
-    = x0*(1-t1)*(1-t2) + x1*t1*(1-t2) + x2*t2
+	= (x0*(1-t1) + x1*t1)*(1-t2) + x2*t2
+	= x0*(1-t1)*(1-t2) + x1*t1*(1-t2) + x2*t2
 ```
 
 Notice that each part of our repeated sum includes `(1-tn)` from its neighbours to the right.
@@ -87,7 +87,7 @@ And we can see that with the use of `WavePrefixProduct`, `WaveActiveSum` and rev
 ```
 float WaveActiveLerp(float value, float t)
 {
-    float prefixProduct = WavePrefixProduct(1.0f - t);
+	float prefixProduct = WavePrefixProduct(1.0f - t);
 	float laneValue = value * t * prefixProduct;
 	return WaveActiveSum(laneValue);
 }
@@ -100,15 +100,15 @@ float WaveActiveLerp(float value, float t)
 [numthreads(32,1,1)]
 void CS(uint3 dispatchId : SV_DispatchThreadId)
 {
-    // We need to reverse our indices.
-    uint reversedIndex = 32 - dispatchId.x - 1;
+	// We need to reverse our indices.
+	uint reversedIndex = 32 - dispatchId.x - 1;
 
 	float value = CalculateValue(reversedIndex);
-    float interpolant = CalculateInterpolant(reversedIndex);
+	float interpolant = CalculateInterpolant(reversedIndex);
 
-    float interpolation = WaveActiveLerp(value, interpolant);
-    if(dispatchId.x == 0)
-        Output[0] = interpolation;
+	float interpolation = WaveActiveLerp(value, interpolant);
+	if(dispatchId.x == 0)
+		Output[0] = interpolation;
 }
 ```
 
@@ -144,12 +144,12 @@ If we start by calculating `Group0` and then carry the product of all its `(1-n)
 ```
 float2 WaveActiveLerp(float value, float t)
 {
-    float prefixProduct = WavePrefixProduct(1.0f - t);
+	float prefixProduct = WavePrefixProduct(1.0f - t);
 	float laneValue = value * t * prefixProduct;
 
-    float2 result;
-    result.x = WaveActiveSum(laneValue);
-    result.y = WaveActiveProduct(1.0f - t); // Used for continued interpolation.
+	float2 result;
+	result.x = WaveActiveSum(laneValue);
+	result.y = WaveActiveProduct(1.0f - t); // Used for continued interpolation.
 
 	return result;
 }
@@ -164,24 +164,24 @@ int ValueCount;
 [numthreads(32,1,1)]
 void CS(uint3 dispatchId : SV_DispatchThreadId)
 {
-    float result = 0.0f;
-    float carriedInterpolant = 1.0f;
-    for(
-        int reversedIndex = ValueCount-dispatchId.x-1;
-        reversedIndex >= 0;
-        reversedIndex -= 32)
-    {
-        float value = CalculateValue(reversedIndex);
-        float interpolant = CalculateInterpolant(reversedIndex);
+	float result = 0.0f;
+	float carriedInterpolant = 1.0f;
+	for(
+		int reversedIndex = ValueCount-dispatchId.x-1;
+		reversedIndex >= 0;
+		reversedIndex -= 32)
+	{
+		float value = CalculateValue(reversedIndex);
+		float interpolant = CalculateInterpolant(reversedIndex);
 
-        float2 interpolation = WaveActiveLerp(value, interpolant);
+		float2 interpolation = WaveActiveLerp(value, interpolant);
 
-        result += interpolation.x * carriedInterpolant;
-        carriedInterpolant *= interpolation.y;
-    }
+		result += interpolation.x * carriedInterpolant;
+		carriedInterpolant *= interpolation.y;
+	}
 
-    if(dispatchId.x == 0)
-        Output[0] = interpolation;
+	if(dispatchId.x == 0)
+		Output[0] = interpolation;
 }
 ```
 
@@ -221,7 +221,7 @@ uint WaveGetLastLaneIndex()
 	uint4 ballot = WaveActiveBallot(true);
 	uint4 bits = firstbithigh(ballot); // Returns -1 (0xFFFFFFFF) if no bits set.
 	
-    bits = select(bits == 0xFFFFFFFF, 0, bits + uint4(0, 32, 64, 96));
+	bits = select(bits == 0xFFFFFFFF, 0, bits + uint4(0, 32, 64, 96));
 
 	return max(max(max(bits.x, bits.y), bits.z), bits.w);
 }
@@ -237,9 +237,9 @@ uint WaveGetLastLaneIndex()
 	uint4 ballot = WaveActiveBallot(true);
 	uint4 bits = firstbithigh(ballot); // Returns -1 (0xFFFFFFFF) if no bits set.
 	
-    // Force scalarization here. See: https://godbolt.org/z/barT3rM3W
-    bits = WaveReadLaneFirst(bits);
-    bits = select(bits == 0xFFFFFFFF, 0, bits + uint4(0, 32, 64, 96));
+	// Force scalarization here. See: https://godbolt.org/z/barT3rM3W
+	bits = WaveReadLaneFirst(bits);
+	bits = select(bits == 0xFFFFFFFF, 0, bits + uint4(0, 32, 64, 96));
 
 	return max(max(max(bits.x, bits.y), bits.z), bits.w);
 }
