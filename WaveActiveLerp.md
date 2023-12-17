@@ -112,6 +112,8 @@ void CS(uint3 dispatchId : SV_DispatchThreadId)
 }
 ```
 
+**A Word Of Caution:** On some platforms, I've observed `WavePrefixProduct(value)` being compiled to `WavePostfixProduct(value)/value`. If `value` is 0, you'll end up creating some NaNs! It might be worthwhile to validate that your compiler is not generating code like this and to potentially add a `max(value, 0.00001f)` if it does.
+
 ## Continued Interpolation
 
 If you need to interpolate more than your wave size, the approach is relatively simple.
