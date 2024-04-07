@@ -1,0 +1,135 @@
+typedef float4 SHL1;
+struct ColorSH
+{
+	SHL1 R;
+	SHL1 G;
+	SHL1 B;
+};
+
+struct PackedColorSH
+{
+	uint4 Data;
+};
+
+float2 octahedralWrap( float2 v )
+{
+	float2 result;
+	result.x = (1.0f - abs(v.y)) * (v.x >= 0.0f ? 1.0f : -1.0f);
+	result.y = (1.0f - abs(v.x)) * (v.y >= 0.0f ? 1.0f : -1.0f);
+	return result;
+}
+
+float2 toOctahedral(float3 dir)
+{
+	dir = dir * rcp( abs( dir.x ) + abs( dir.y ) + abs( dir.z ) );
+	float2 results = dir.z >= 0.0f ? dir.xy : octahedralWrap( dir.xy );
+	results = mad(results, 0.5f, 0.5f);
+	return results;
+}
+
+float3 fromOctahedral(float2 oct)
+{
+	oct = mad(oct, 2.0f, -1.0f);
+ 
+	// https://twitter.com/Stubbesaurus/status/937994790553227264
+	float3 n = float3(oct.x, oct.y, 1.0f - abs(oct.x) - abs(oct.y));
+	float t = saturate( -n.z );
+	n.x += n.x >= 0.0f ? -t : t;
+	n.y += n.y >= 0.0f ? -t : t;
+	return normalize( n );
+}
+
+uint2 packUnorm(float2 v, uint bits)
+{
+	float maxValue = float((1u << bits) - 1);
+	uint2 u = uint2(round(v * maxValue));
+	return u;
+}
+
+float2 unpackUnorm(uint2 u, uint bits)
+{
+	float invMaxValue = rcp(float((1u << bits) - 1));
+	return float2(u) * invMaxValue;
+}
+
+uint3 packUnorm(float3 v, uint bits)
+{
+	float maxValue = float((1u << bits) - 1);
+	uint3 u = uint3(round(v * maxValue));
+	return u;
+}
+
+float3 unpackUnorm(uint3 u, uint bits)
+{
+	float invMaxValue = rcp(float((1u << bits) - 1));
+	return float3(u) * invMaxValue;
+}
+
+PackedColorSH packSH(ColorSH sh)
+{
+	float3 ambient = float3(sh.R.x, sh.G.x, sh.B.x);
+	float3 dirR = sh.R.yzw;
+	float3 dirG = sh.G.yzw;
+	float3 dirB = sh.B.yzw;
+
+	float3 scale = float3
+	(
+		length(dirR),
+		length(dirG),
+		length(dirB)
+	);
+
+	// We need to make sure we encode a valid direction.
+	// The actual direction doesn't matter if scale is 0
+	// Its going to be scaled down to 0 in the unpacking anyways.
+	dirR = scale.r > 0.0f ? dirR / scale.r : float3(1.0f, 0.0f, 0.0f);
+	dirG = scale.g > 0.0f ? dirG / scale.g : float3(1.0f, 0.0f, 0.0f);
+	dirB = scale.b > 0.0f ? dirB / scale.b : float3(1.0f, 0.0f, 0.0f);
+
+	uint2 octDirR = packUnorm(toOctahedral(dirR), 9);
+	uint2 octDirG = packUnorm(toOctahedral(dirG), 9);
+	uint2 octDirB = packUnorm(toOctahedral(dirB), 9);
+
+	uint3 packedScale = packUnorm((scale / ambient), 8);
+
+	// Can ignore sign bit, expected to be positive.
+	uint halfAmbientR = f32tof16(max(ambient.r, 0.0f));
+	uint halfAmbientG = f32tof16(max(ambient.g, 0.0f));
+	uint halfAmbientB = f32tof16(max(ambient.b, 0.0f));
+
+	PackedColorSH packed;
+
+	// Bit format: 15 | 9 | 8
+	packed.Data[0] = halfAmbientR | (octDirR.x << 15) | (packedScale.r << 24);
+	packed.Data[1] = halfAmbientG | (octDirG.x << 15) | (packedScale.g << 24);
+	packed.Data[2] = halfAmbientB | (octDirB.x << 15) | (packedScale.b << 24);
+	packed.Data[3] = octDirR.y | (octDirG.y << 9) | (octDirB.y << 18); // 5 bits leftover
+
+	return packed;
+}
+
+ColorSH unpackSH(PackedColorSH packed)
+{
+	uint3 packedScale = uint3(packed.Data[0] >> 24, packed.Data[1] >> 24, packed.Data[2] >> 24);
+	uint halfAmbientR = packed.Data[0] & 0x7FFF;
+	uint halfAmbientG = packed.Data[1] & 0x7FFF;
+	uint halfAmbientB = packed.Data[2] & 0x7FFF;
+
+	uint2 packedDirR = uint2((packed.Data[0] >> 15) & 0x1FF, packed.Data[3] & 0x1FF);
+	uint2 packedDirG = uint2((packed.Data[1] >> 15) & 0x1FF, (packed.Data[3] >> 9) & 0x1FF);
+	uint2 packedDirB = uint2((packed.Data[2] >> 15) & 0x1FF, (packed.Data[3] >> 18) & 0x1FF);
+
+	float3 ambient = float3(f16tof32(halfAmbientR), f16tof32(halfAmbientG), f16tof32(halfAmbientB));
+	float3 scale = ambient * unpackUnorm(packedScale, 8);
+
+	float3 dirR = fromOctahedral(unpackUnorm(packedDirR, 9));
+	float3 dirG = fromOctahedral(unpackUnorm(packedDirG, 9));
+	float3 dirB = fromOctahedral(unpackUnorm(packedDirB, 9));
+
+	ColorSH sh;
+	sh.R = float4(ambient.x, dirR * scale.r);
+	sh.G = float4(ambient.y, dirG * scale.g);
+	sh.B = float4(ambient.z, dirB * scale.b);
+
+	return sh;
+}
