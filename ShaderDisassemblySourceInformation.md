@@ -74,7 +74,7 @@ When we try that, we get our source information!
 
 ## Conclusions
 
-That's the end for this short post.Hopefully this helps!
+That's the end for this short post. Hopefully this helps!
 
-As an asice, I'm not sure why RGA uses `amdgpu-dis.exe` instead of `llvm-objdump.exe` but perhaps it will include source information as an optional parameter in the future!
+As an aside, I'm not sure why RGA uses `amdgpu-dis.exe` instead of `llvm-objdump.exe` but perhaps it will include source information as an optional parameter in the future!
 
