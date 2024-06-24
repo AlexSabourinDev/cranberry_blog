@@ -102,8 +102,10 @@ $$
 Now we know the normal of the surfaces that will reflect light to the viewer given a particular light and view direction. We can then plug that into our original equation to determine the amount of light seen by our viewer!
 
 $$
+\displaylines{
 Half = normalize(LightDir + ViewDir) \newline
 Light_{Out} = Proportion(Half) * Light_{In}
+}
 $$
 
 
