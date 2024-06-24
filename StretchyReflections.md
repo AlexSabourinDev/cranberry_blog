@@ -12,7 +12,9 @@ I thought I would share that with you!
 
 ## A Brief Detour Into Microfacet Models
 
-I'm going to make a brief detour to summarize microfacets and perfect mirrors as these details are necessary to understand why we get those stretchy reflections.
+For this post, I'm assuming that the reader is not familiar with microfacet models. If you are, feel free to skip ahead.
+
+Alright, let's take a brief detour to summarize microfacets and perfect mirrors as these details are necessary to understand why we get those stretchy reflections.
 
 I will skim over a lot. If you want a deeper breakdown of BRDFs and microfacet models I recommend these various blog posts, papers and books that provide a much deeper and more informative view:
 
@@ -22,6 +24,8 @@ From Theory To Implementation - Microfacet Models](https://www.pbr-book.org/3ed-
 - [Crash Course in BRDF Implementation](https://boksajak.github.io/files/CrashCourseBRDF.pdf)
 - [Construction of a Microfacet Specular BSDF: A Geometric Approach](https://zero-radiance.github.io/post/microfacet-specular/)
 - [Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs](https://jcgt.org/published/0003/02/03/)
+
+Let's get started.
 
 Common lighting models in games make use of whats called a microfacet model. To highlight the idea behind these models, let's look at a physical example.
 
@@ -39,9 +43,9 @@ But if we take a microscopic view of the cross section, you'll see that it's act
 
 (This image is not the cross section of the exact piece of metal above... I do not own zinc-plated steel... or a microscope)
 
-This cross section describes the core of microfacet models. These models assume that a large, flat, surface is actually made up of tiny little perfectly flat segments to make up a "microsurface".
+This cross section describes the core of microfacet models. These models assume that a large, flat surface is actually made up of tiny little perfectly flat segments to make up a "microsurface".
 
-Instead of having a flat surface.
+Instead of having a flat surface like this.
 
 ![](StretchyReflections_Assets/FlatSurface.PNG)
 
@@ -49,7 +53,7 @@ We have a bumpy one made up of tiny little flat surfaces.
 
 ![](StretchyReflections_Assets/BumpySurface.PNG)
 
-Then, we make **another** assumption.
+Then, we make another assumption.
 
 What if all of these tiny little surfaces are actually perfect mirrors?
 
@@ -59,7 +63,7 @@ Where a perfect mirror is a surface that will reflect incoming light in a single
 
 This assumption drastically simplifies the mathematics of our model.
 
-So we have a bunch of little surfaces that we called microfacets and we also assume that they're perfect mirrors.
+So we have a large number of little surfaces that we called microfacets and we also assume that they're perfect mirrors.
 
 What's next?
 
@@ -67,11 +71,7 @@ What's next?
 
 We need to find out how much light reaches the viewer!
 
-To find out how much light reaches the viewer, we need to know how much light each microfacet reflects towards the viewer.
-
-Since we assumed that our surface was made up of tiny little perfect mirrors, only a single **exact** orientation of mirror will reflect light to our viewer.
-
-Every other mirror will not contribute to what our viewer sees.
+To find out, we need to know how much light each microfacet reflects towards the viewer. Since we assumed that our surface was made up of tiny little perfect mirrors, only a single exact orientation of mirror will reflect light to our viewer. Every other mirror will not contribute to what our viewer sees.
 
 ![](StretchyReflections_Assets/MirrorSurface_HitsEye.PNG)
 
@@ -79,12 +79,32 @@ We need to know how many of these microfacets are facing in that direction. I.e.
 
 Once we have that proportion, determining the amount of light received by our viewer for a particular light direction is simply a matter of multiplying the total amount of light by the proportion of microfacets that align with the "right" orientation.
 
-$Light_{Out} = Proportion(Orientation) * Light_{In}$
+$$
+Light_{Out} = Proportion(Orientation) * Light_{In}
+$$
 
 (I'm choosing to ignore shadowing and masking for simplicity - for a more thorough and accurate overview of these models, take a look at some of the links I shared above. They're really good!)
 
-What **is** this "exact" orientation of mirror? What is the normal of the mirror that will reflect light to our viewer given a particular light and view direction?
+What **is** this exact orientation of mirror?
 
+It's simply the microfacet with a normal that points halfway between our light vector and view vector. The normal of that microfacet is usually called the half vector.
+
+![](StretchyReflections_Assets/LightAndViewDir_00.PNG)
+
+![](StretchyReflections_Assets/LightAndViewDir_01.PNG)
+
+Calculating our half vector is as simple as adding up our light and view vectors and then normalizing them.
+
+$$
+Half = normalize(LightDir + ViewDir)
+$$
+
+Now we know the normal of the surfaces that will reflect light to the viewer given a particular light and view direction. We can then plug that into our original equation to determine the amount of light seen by our viewer!
+
+$$
+Half = normalize(LightDir + ViewDir) \newline
+Light_{Out} = Proportion(Half) * Light_{In}
+$$
 
 
 // Outline
