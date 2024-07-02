@@ -14,7 +14,7 @@ I thought I would share that with you!
 
 For this post, I'm assuming that the reader is not familiar with microfacet models. If you are, feel free to skip ahead.
 
-Alright, let's take a brief detour to summarize microfacets and perfect mirrors as these details are necessary to understand why we get those stretchy reflections.
+Let's take a brief detour to summarize microfacets and perfect mirrors as these details are necessary to understand why we get those stretchy reflections.
 
 I will skim over a lot. If you want a deeper breakdown of BRDFs and microfacet models I recommend these various blog posts, papers and books that provide a much deeper and more informative view:
 
@@ -25,27 +25,19 @@ From Theory To Implementation - Microfacet Models](https://www.pbr-book.org/3ed-
 - [Construction of a Microfacet Specular BSDF: A Geometric Approach](https://zero-radiance.github.io/post/microfacet-specular/)
 - [Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs](https://jcgt.org/published/0003/02/03/)
 
-Let's get started.
-
 Common lighting models in games make use of whats called a microfacet model. To highlight the idea behind these models, let's look at a physical example.
 
 ![](StretchyReflections_Assets/ZincCoatedSteel_Plate.jpg)
 
 This is a piece of zinc-plated steel.
 
-If I were to ask you: "Is this a flat surface?"
-
-It seems likely that you would say yes!
-
-But if we take a microscopic view of the cross section, you'll see that it's actually quite a bit bumpy!
+If I were to ask you: "Is this a flat surface?" It seems likely that you would say yes! But if we take a microscopic view of the cross section, you'll see that it's actually quite a bit bumpy!
 
 ![](StretchyReflections_Assets/ZincCoatedSteel_CrossSection.jpg)
 
-(This image is not the cross section of the exact piece of metal above... I do not own zinc-plated steel... or a microscope)
+This cross section highlights the core idea of microfacet models. These models assume that a large, flat surface is made up of tiny little perfectly flat segments to make up a "microsurface".
 
-This cross section describes the core of microfacet models. These models assume that a large, flat surface is actually made up of tiny little perfectly flat segments to make up a "microsurface".
-
-Instead of having a flat surface like this.
+Instead of having a flat surface.
 
 ![](StretchyReflections_Assets/FlatSurface.PNG)
 
@@ -53,7 +45,7 @@ We have a bumpy one made up of tiny little flat surfaces.
 
 ![](StretchyReflections_Assets/BumpySurface.PNG)
 
-Then, we make another assumption.
+Specular microfacet models make another assumption.
 
 What if all of these tiny little surfaces are actually perfect mirrors?
 
@@ -71,11 +63,11 @@ What's next?
 
 We need to find out how much light reaches the viewer!
 
-To find out, we need to know how much light each microfacet reflects towards the viewer. Since we assumed that our surface was made up of tiny little perfect mirrors, only a single exact orientation of mirror will reflect light to our viewer. Every other mirror will not contribute to what our viewer sees.
+To find out, we need to know how much light each microfacet reflects towards our view direction. Since we assumed that our surface was made up of tiny little perfect mirrors, only a single exact orientation of mirror will reflect light to our viewer. Every other mirror will not contribute to what our viewer sees.
 
 ![](StretchyReflections_Assets/MirrorSurface_HitsEye.PNG)
 
-We need to know how many of these microfacets are facing in that direction. I.e. what is the proportion of microfacets with that direction.
+We need to know how many of these microfacets are facing in that direction.
 
 Once we have that proportion, determining the amount of light received by our viewer for a particular light direction is simply a matter of multiplying the total amount of light by the proportion of microfacets that align with the "right" orientation.
 
@@ -83,11 +75,13 @@ $$
 Light_{Out} = Proportion(Orientation) * Light_{In}
 $$
 
-(I'm choosing to ignore shadowing and masking for simplicity - for a more thorough and accurate overview of these models, take a look at some of the links I shared above. They're really good!)
+(I'm choosing to ignore shadowing and masking for simplicity - for a more thorough and accurate overview of microfacet models, take a look at some of the links I shared above. They're really good!)
 
 What **is** this exact orientation of mirror?
 
-It's simply the microfacet with a normal that points halfway between our light vector and view vector. The normal of that microfacet is usually called the half vector.
+It's simply the microfacet with a normal that points halfway between our light vector and view vector.
+
+The normal of that microfacet is usually called the half vector.
 
 ![](StretchyReflections_Assets/LightAndViewDir_00.PNG)
 
@@ -107,6 +101,49 @@ Half = normalize(LightDir + ViewDir) \newline
 Light_{Out} = Proportion(Half) * Light_{In}
 \end{aligned}
 $$
+
+### Distributions
+
+Now that we have a series of perfect mirror microfacets and we know how to determine the amount of light the viewer receives, we simply need to figure out how to calculate the proportion of microfacets that point in the direction of our half vector.
+
+What we need is a distribution!
+
+Perhaps we could use a Gaussian distribution? We could assume that the mean of our distribution matches the normal of our geometry.
+
+Below is an example of our macro geometry. The geometry before we apply our distribution.
+
+![](StretchyReflections_Assets/MacroGeometry.png)
+
+When we assume that our macro geometry is actually made up of microfacets following a Gaussian distribution, we get something similar to the original microsurface we described above.
+
+![](StretchyReflections_Assets/BumpySurface.PNG)
+
+Since our geometry is described by a Gaussian distribution, we can modify the standard deviation of our distribution to vary between a smooth and rough microsurface.
+
+A wider distribution would describe a rough surface.
+
+![](StretchyReflections_Assets/RoughMicroGeometry.png)
+
+While a narrow distribution would describe a smoother surface.
+
+![](StretchyReflections_Assets/SmoothMicroGeometry.png)
+
+#### Mapping To Slope Space
+
+We have a problem though...
+
+How do we map a Gaussian distribution to our microfacet normals?
+
+Our microfacet normals are three dimensional unit vectors. Isotropic Gaussian distributions are easily described in two dimensions.
+
+If we could convert our normal into a two dimensional vector, we could input that value into a two dimensional Gaussian distribution and find out the proportion of normals that we've been looking for all along!
+
+The transformation we're looking for is a transformation into slope space.
+
+For the purposes of this post, we won't be describing slope space. You can read more about it here: [Slope Space in BRDF Theory](https://www.reedbeta.com/blog/slope-space-in-brdf-theory/). For even more reading, slope space can be viewed as a specialization of a stereographic projection which is you can read more about on [Wikipedia](https://en.wikipedia.org/wiki/Stereographic_projection).
+
+What matters to us is that slope space allows us to transform our three dimensional unit vector into a two dimensional vector.
+
 
 
 // Outline
