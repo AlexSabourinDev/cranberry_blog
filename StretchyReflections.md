@@ -136,13 +136,78 @@ How do we map a Gaussian distribution to our microfacet normals?
 
 Our microfacet normals are three dimensional unit vectors. Isotropic Gaussian distributions are easily described in two dimensions.
 
-If we could convert our normal into a two dimensional vector, we could input that value into a two dimensional Gaussian distribution and find out the proportion of normals that we've been looking for all along!
+If we could convert our normal into a two dimensional vector, we could input that value into a two dimensional Gaussian distribution and find out the proportion of normals that we've been looking for!
 
 The transformation we're looking for is a transformation into slope space.
 
 For the purposes of this post, we won't be describing slope space. You can read more about it here: [Slope Space in BRDF Theory](https://www.reedbeta.com/blog/slope-space-in-brdf-theory/). For even more reading, slope space can be viewed as a specialization of a stereographic projection which is you can read more about on [Wikipedia](https://en.wikipedia.org/wiki/Stereographic_projection).
 
 What matters to us is that slope space allows us to transform our three dimensional unit vector into a two dimensional vector.
+
+We can visualize our two dimensional Gaussian as a contour map where our center has the highest value and the values decrease as we move away from the center.
+
+![](StretchyReflections_Assets/GaussianPDF.png)
+
+Note that the center of our 2 dimensional Gaussian represents our macro surface normal.
+
+This macro surface normal:
+
+![](StretchyReflections_Assets/MacrofacetNormal.PNG)
+
+Is equivalent to this point on our Gaussian distribution:
+
+![](StretchyReflections_Assets/GaussianPDF_CenterPoint.png)
+
+As a result, if we wanted to know the proportion of microfacets that have this normal:
+
+![](StretchyReflections_Assets/MicrofacetNormal.PNG)
+
+We might sample this point on our Gaussian:
+
+![](StretchyReflections_Assets/GaussianPDF_SamplePoint.png)
+
+### Putting It All Together
+
+We have almost all the pieces we need to describe *why* reflections stretch along the horizon given a microfacet model.
+
+Let's review.
+
+We have a macro surface with a normal.
+
+![](StretchyReflections_Assets/MacroGeometry.png)
+
+We add micro detail.
+
+![](StretchyReflections_Assets/MacrofacetNormal.PNG)
+
+We add a view direction.
+
+![](StretchyReflections_Assets/ViewDirection.PNG)
+
+We add a light direction.
+
+![](StretchyReflections_Assets/ViewAndLightDirection.PNG)
+
+From there, we can calculate the halfway vector between the view and light direction.
+
+![](StretchyReflections_Assets/HalfVector.PNG)
+
+We take the half vector and convert it to slope space and calculate our Gaussian at that point.
+
+![](StretchyReflections_Assets/GaussianPDF_SamplePoint.png)
+
+Finally, we multiply the result of our distribution to our light intensity and we're done!
+
+$$
+\begin{gather*}
+Half = normalize(LightDir + ViewDir) \newline
+Light_{Out} = Gaussian(ToSlopeSpace(Half)) * Light_{In}
+\end{gather*}
+$$
+
+(Keeping in mind that I'm omitting many details but none of them important for this particular exploration)
+
+## Reflections And Why They Stretchy
 
 
 
