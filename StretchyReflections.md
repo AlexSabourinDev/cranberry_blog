@@ -213,71 +213,94 @@ At this stage, we should have every piece we need to understand why reflections 
 
 The secret lies in our use of the half vector and centering our distribution around our macro surface normal. Let's break that down.
 
-First, we'll explore a case where the reflections do not stretch. When the view vector aligns with our macro surface normal, our reflections are fully isotropic. I.e. they do not stretch.
+First, we'll explore a case where the reflections do not stretch. When our view vector aligns with our macro surface normal, our reflections are fully isotropic. I.e. they do not stretch along a particular axis.
 
+In order to determine what our reflection should look like in the first place, we need to accumulate the light arriving at our surface from all directions.
 
+![](StretchyReflections_Assets/AccumulatingReflections_Isotropic.gif)
 
-// Outline
+The green line is our view vector, the red is our half vector and the yellow is our light vector. As you can see, the half vector remains at a constant distance from our sphere's apex.
 
-What do I need to touch on for this to make sense?
+If we visualize this in slope space with our Gaussian, it would look something like this.
 
-- Some familiarity with microfacet BRDFs
-    - Specular BRDFs are modeled as a small bumpy surface (typically a heightfield)
-        - https://google.github.io/filament/images/diagram_microfacet.png
-        - Each of those lines in the image is typically called a "microfacet"
-        - You can think of it as a series of small perfect mirrors
-    - How each of these mirrors is distributed can described by some function
-        - That distribution (The normal distribution function/NDF) describes how _many_ of these mirrors will point in a particular direction
-        - Common BRDFs will model a distribution where most of the microfacets will align with the macro surface normal (i.e. your geometry's normal)
-            - https://www.scribbr.com/wp-content/uploads/2023/02/standard-normal-distribution-example.webp
+![](StretchyReflections_Assets/SlopeSpace_Isotropic.gif)
 
-- Lets step back and think about perfect mirrors and point lights
-    - A perfect mirror will simply reflect your view vector along its normal
-        - https://docs.unity3d.com/StaticFiles/ScriptRefImages/Vec3ReflectDiagram.png
-    - For a point light, a single direction will contribute to a single point on the surface
-        - https://www.tutorialspoint.com/javafx/images/point_light_source.jpg
-    - Given our view vector and light vector, we can figure out what angle a perfect mirror should be for us to see the light source
-        - Any other direction, no light source
+And finally, if we visualize the result of our Gaussian for each light direction to our final reflection result we get a nice circular shape.
 
-- As we know, our surface is made up of some distribution of perfect mirrors
-- We also have a light direction and a view direction that tell us what normal we need to see our point light
+![](StretchyReflections_Assets/IsotropicInfluenceOnSphere.PNG)
 
-- From there, we can ask:
-    - How many, of the MANY little mirrors, match that normal? I.e. how many of these mirrors actually reflect any light towards the viewer?
-        - You can think of this question more formally as "What is the _density_ of mirrors that point in this particular direction?"
-    - We can calculate that normal (usually called the _half_ vector) and plug that into our distribution to get that proportion!
+All of this aligns with a nice, uniform, non-stretchy reflection.
 
-- Okay, we have the background we need to figure out why reflections are stretchy at the horizon!
-- First, lets look at a distribution that might be used for a common BRDF, the gaussian distribution.
-    - https://learn.astropy.org/tutorials/nboutput/synthetic-images.ipynb_23_1.png
-    - In this 2D space, each point represents a particular normal of our microsurface and the intensity of the function represents the proportion of mirrors that face that particular direction
+But what if we view our surface at an angle closer to the horizon?
 
-- Lets imagine a particular example where a view vector and a light vector gives us a half vector
-    - We would then plug that half vector into our function and get out some value to use for our lighting calculation.
+![](StretchyReflections_Assets/VectorHorizonAngle.gif)
 
-- Up to this point, we've been talking about using a point light, but what about something like a cubemap?
-    - Well, then we just want to accumulate the light from all possible directions in the hemisphere and sum their contributions!
+Hm... that looks different. Lets look at it from the top.
 
-- This is all well and good
-    - But there's still no stretchiness!
-    - The function we saw is perfectly symmetrical.
-        - We would expect to see something a bit like this instead https://n-o-r.xyz/images/gp/2d_gaussian.png
-            - Where the contributions of each normal is clearly asymetric
+![](StretchyReflections_Assets/VectorHorizonAngle_TopDown.gif)
 
-- But that's not where the stretchiness comes from.
+Notice how as we move our view vector along the horizon our half vector moves away from the apex? Let's investigate this a bit further in slope space.
 
-- The stretchiness is actually from how we define our half vector...
+![](StretchyReflections_Assets/HorizonAngle_SlopeSpace_01.gif)
 
-- Lets visualize that
-    - Notice how, when our view vector is parallel to our macro surface normal, everything is right in the world.
-    - But, see what happens when my view vector slowly wanders away from the macro normal
-        - See how our half vector moves away from our center of influence as we move along the major axis
-        - And see how it move dramatically more quickly as we move along our minor axis!
-    - What happens if we plot that on a sphere?
-        - You get an asymmetrical lobe!
+This matches the behaviour we observed in 3D. Our half vector is moving away from the center of our distribution with the most influence. What happens to our half vector if we vary the altitude of our light vector?
 
-- And that's it!
-    - That's why reflections are stretchy under our BRDF models!
-        - Its a combination of the formulation of specular BRDFs as perfect mirrors and the rate at which half vectors move away from the macro surface normal at different viewing angles.
+![](StretchyReflections_Assets/HorizonAngle_ChangingViewAltitude.gif)
 
-# Bonus Content - Trying (And Failing) To Approximate It
+It seems as though our half vector is moving away from our apex at different rates based on the altitude of our view vector!
+
+Let's validate that in slope space.
+
+![](StretchyReflections_Assets/HorizonAngle_SlopeSpace_ChangingViewAltitude.gif)
+
+Notice how our half vector moves away from the center of our distribution at a faster rate as our light vector moves closer to the horizon!
+
+As a result, we would expect to see the influence of a particular light vector to get narrower the closer it gets to the horizon.
+
+What does it look like when we visualize the influence for each light vector on a hemisphere? It looks like this.
+
+![](StretchyReflections_Assets/AnisotropicInfluenceOnSphere.PNG)
+
+A stretched area of influence which **finally** results in a stretchy reflection!
+
+## Conclusion
+
+And that's it!
+
+Because our half vector moves away from our macro surface normal at an increased rate as the light vector approaches the horizon, the area that contributes to the reflection is "squished" along the horizontal axis.
+
+There are three elements that contribute to stretchy reflections when viewed at the horizon.
+
+1. The use of the half vector to determine the proportion of microfacets that are reflecting light to the viewer.
+2. Centering our microfacet distribution around our macro surface normal.
+3. Distributing the majority of our microfacets around the macro surface normal.
+
+Hopefully this was insightful to you! If you have any questions or comments, you can reach out to me on Mastodon at [@AlexSneezeKing@mastodon.gamedev.place](https://mastodon.gamedev.place/@AlexSneezeKing).
+
+# Bonus Content - Trying (And Failing) To Approximate Anisotropic Reflections
+
+You're still here?
+
+Great!
+
+Let's talk about my failed attempts at approximating anisotropic reflections for image based lighting.
+
+Fair warning, I am assuming the reader of this section is familiar with the ideas behind the Split-Sum Approximation for image based lighting. For a refresher, the links below describe the technique.
+
+- [Real Shading in Unreal Engine 4](https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf)
+- [Alternative Take on the Split Sum Approximation for Cubemap Pre-filtering](https://zero-radiance.github.io/post/split-sum/)
+
+A limitation of this technique is the fact that we use an isotropic approximation of our convolved lighting environment.
+
+I wanted to explore potential approximations that could allow for anisotropic reflections at grazing angles.
+
+## Analyzing The Data
+
+Let's visualize the data. I built a shadertoy sample that explores how our colors change along the longitude of  
+
+## Spherical Harmonics
+
+## Fourier Terms
+
+## Solving For A Reflection Vector Stretch And Bias
+
