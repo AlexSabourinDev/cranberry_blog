@@ -192,11 +192,11 @@ From there, we can calculate the halfway vector between the view and light direc
 
 ![](StretchyReflections_Assets/HalfVector.PNG)
 
-We take the half vector and convert it to slope space and calculate our Gaussian at that point.
+We take the half vector and convert it to slope space and sample our Gaussian at that point.
 
 ![](StretchyReflections_Assets/GaussianPDF_SamplePoint.png)
 
-Finally, we multiply the result of our distribution to our light intensity and we're done!
+Finally, we multiply the result of our distribution by our light intensity and we're done!
 
 $$
 \begin{gather*}
@@ -207,7 +207,13 @@ $$
 
 (Keeping in mind that I'm omitting many details but none of them important for this particular exploration)
 
-## Reflections And Why They Stretchy
+## Reflections And Why They're Stretchy
+
+At this stage, we should have every piece we need to understand why reflections become stretchy at the horizon.
+
+The secret lies in our use of the half vector and centering our distribution around our macro surface normal. Let's break that down.
+
+First, we'll explore a case where the reflections do not stretch. When the view vector aligns with our macro surface normal, our reflections are fully isotropic. I.e. they do not stretch.
 
 
 
