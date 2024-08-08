@@ -2,7 +2,9 @@
 
 Often, when I walk along the Ottawa river, I like to look at the reflections.
 
-// TODO: Picture of water in Ottawa
+![](StretchyReflections_Assets/Ottawa02.jpg)
+
+![](StretchyReflections_Assets/Ottawa01.jpg)
 
 Notice that the reflections at the horizon are stretching vertically.
 
@@ -12,7 +14,7 @@ I thought I would share that with you!
 
 ## A Brief Detour Into Microfacet Models
 
-For this post, I'm assuming that the reader is not familiar with microfacet models. If you are, feel free to skip ahead.
+For this post, I'm assuming that the reader is not familiar with microfacet models. If you are, feel free to skip ahead. [\[Shortcut\]](#reflections-and-why-theyre-stretchy)
 
 Let's take a brief detour to summarize microfacets and perfect mirrors as these details are necessary to understand why we get those stretchy reflections.
 
@@ -31,7 +33,7 @@ Common lighting models in games make use of whats called a microfacet model. To 
 
 This is a piece of zinc-plated steel.
 
-If I were to ask you: "Is this a flat surface?" It seems likely that you would say yes! But if we take a microscopic view of the cross section, you'll see that it's actually quite a bit bumpy!
+If I were to ask you: "Is this a flat surface?" It seems likely that you would say yes. However, if we take a microscopic view of the cross section, you'll see that it's actually quite a bit bumpy!
 
 ![](StretchyReflections_Assets/ZincCoatedSteel_CrossSection.jpg)
 
@@ -51,7 +53,7 @@ What if all of these tiny little surfaces are actually perfect mirrors?
 
 ![](StretchyReflections_Assets/MirrorSurface.PNG)
 
-Where a perfect mirror is a surface that will reflect incoming light in a single direction. None of that "scattering" stuff. We want **perfect** reflections here! (You'll often see the words "Dirac delta" thrown around when talking about perfect mirrors)
+Where a perfect mirror is a surface that will reflect incoming light in a single direction. None of that "scattering" stuff. We want **perfect** reflections here!
 
 This assumption drastically simplifies the mathematics of our model.
 
@@ -61,7 +63,7 @@ What's next?
 
 ### Reflections
 
-We need to find out how much light reaches the viewer!
+We need to find out how much light reaches the viewer.
 
 To find out, we need to know how much light each microfacet reflects towards our view direction. Since we assumed that our surface was made up of tiny little perfect mirrors, only a single exact orientation of mirror will reflect light to our viewer. Every other mirror will not contribute to what our viewer sees.
 
@@ -75,15 +77,13 @@ $$
 Light_{Out} = Proportion(Orientation) * Light_{In}
 $$
 
-(I'm choosing to ignore shadowing and masking for simplicity - for a more thorough and accurate overview of microfacet models, take a look at some of the links I shared above. They're really good!)
+(You might notice that some of that light should be occluded by other microfacets. This is known as masking and shadowing. I'm choosing to ignore these for simplicit. They aren't necessary for us to understand this phenomenon. For a more thorough and accurate overview of microfacet models, take a look at some of the links I shared above. They're really good!)
 
 What **is** this exact orientation of mirror?
 
 It's simply the microfacet with a normal that points halfway between our light vector and view vector.
 
 The normal of that microfacet is usually called the half vector.
-
-![](StretchyReflections_Assets/LightAndViewDir_00.PNG)
 
 ![](StretchyReflections_Assets/LightAndViewDir_01.PNG)
 
@@ -140,7 +140,7 @@ If we could convert our normal into a two dimensional vector, we could input tha
 
 The transformation we're looking for is a transformation into slope space.
 
-For the purposes of this post, we won't be describing slope space. You can read more about it here: [Slope Space in BRDF Theory](https://www.reedbeta.com/blog/slope-space-in-brdf-theory/). For even more reading, slope space can be viewed as a specialization of a stereographic projection which is you can read more about on [Wikipedia](https://en.wikipedia.org/wiki/Stereographic_projection).
+For the purposes of this post, we won't be describing slope space. You can read more about it here: [Slope Space in BRDF Theory](https://www.reedbeta.com/blog/slope-space-in-brdf-theory/). For even more reading, slope space can be viewed as a specialization of a stereographic projection. [Wikipedia Link](https://en.wikipedia.org/wiki/Stereographic_projection).
 
 What matters to us is that slope space allows us to transform our three dimensional unit vector into a two dimensional vector.
 
@@ -243,17 +243,17 @@ Notice how as we move our view vector along the horizon our half vector moves aw
 
 ![](StretchyReflections_Assets/HorizonAngle_SlopeSpace_01.gif)
 
-This matches the behaviour we observed in 3D. Our half vector is moving away from the center of our distribution with the most influence. What happens to our half vector if we vary the altitude of our light vector?
+This matches the behaviour we observed in 3D. Our half vector is moving away from the center of our distribution. What happens to our half vector if we vary the altitude of our light vector?
 
 ![](StretchyReflections_Assets/HorizonAngle_ChangingViewAltitude.gif)
 
-It seems as though our half vector is moving away from our apex at different rates based on the altitude of our view vector!
+It seems as though our half vector is moving away from our apex at different rates based on the altitude of our light and vectors!
 
 Let's validate that in slope space.
 
 ![](StretchyReflections_Assets/HorizonAngle_SlopeSpace_ChangingViewAltitude.gif)
 
-Notice how our half vector moves away from the center of our distribution at a faster rate as our light vector moves closer to the horizon!
+Notice how our half vector moves away from the center of our distribution at a faster rate as our light vector moves closer to the horizon.
 
 As a result, we would expect to see the influence of a particular light vector to get narrower the closer it gets to the horizon.
 
@@ -267,7 +267,7 @@ A stretched area of influence which **finally** results in a stretchy reflection
 
 And that's it!
 
-Because our half vector moves away from our macro surface normal at an increased rate as the light vector approaches the horizon, the area that contributes to the reflection is "squished" along the horizontal axis.
+When our view vector approaches the horizon, our half vector moves away from our macro surface normal at an increased rate as the light vector also approaches the horizon. The area that contributes to the reflection is "squished" along the horizontal axis.
 
 There are three elements that contribute to stretchy reflections when viewed at the horizon.
 
@@ -276,31 +276,3 @@ There are three elements that contribute to stretchy reflections when viewed at 
 3. Distributing the majority of our microfacets around the macro surface normal.
 
 Hopefully this was insightful to you! If you have any questions or comments, you can reach out to me on Mastodon at [@AlexSneezeKing@mastodon.gamedev.place](https://mastodon.gamedev.place/@AlexSneezeKing).
-
-# Bonus Content - Trying (And Failing) To Approximate Anisotropic Reflections
-
-You're still here?
-
-Great!
-
-Let's talk about my failed attempts at approximating anisotropic reflections for image based lighting.
-
-Fair warning, I am assuming the reader of this section is familiar with the ideas behind the Split-Sum Approximation for image based lighting. For a refresher, the links below describe the technique.
-
-- [Real Shading in Unreal Engine 4](https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf)
-- [Alternative Take on the Split Sum Approximation for Cubemap Pre-filtering](https://zero-radiance.github.io/post/split-sum/)
-
-A limitation of this technique is the fact that we use an isotropic approximation of our convolved lighting environment.
-
-I wanted to explore potential approximations that could allow for anisotropic reflections at grazing angles.
-
-## Analyzing The Data
-
-Let's visualize the data. I built a shadertoy sample that explores how our colors change along the longitude of  
-
-## Spherical Harmonics
-
-## Fourier Terms
-
-## Solving For A Reflection Vector Stretch And Bias
-
