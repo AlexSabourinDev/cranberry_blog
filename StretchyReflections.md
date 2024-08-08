@@ -77,7 +77,7 @@ $$
 Light_{Out} = Proportion(Orientation) * Light_{In}
 $$
 
-(You might notice that some of that light should be occluded by other microfacets. This is known as masking and shadowing. I'm choosing to ignore these for simplicit. They aren't necessary for us to understand this phenomenon. For a more thorough and accurate overview of microfacet models, take a look at some of the links I shared above. They're really good!)
+(You might notice that some of that light should be occluded by other microfacets. This is known as masking and shadowing. I'm choosing to ignore these for simplicity. They aren't necessary for us to understand this phenomenon. For a more thorough and accurate overview of microfacet models, take a look at some of the links I shared above. They're really good!)
 
 What **is** this exact orientation of mirror?
 
