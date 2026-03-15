@@ -1,3 +1,5 @@
+# Why Raymarched Transmittance Is Biased
+
 ## How We Got Here
 
 Recently - I've been doing some research into better sample placement for raymarching.
