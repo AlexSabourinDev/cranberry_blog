@@ -106,6 +106,7 @@ The equation we're looking to evaluate is:
 $$
 exp(-\int opticalDepth(t)dt) \simeq exp(-E[opticalDepth])
 $$
+
 But the code above evaluates:
 
 $$
