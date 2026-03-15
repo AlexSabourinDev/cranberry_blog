@@ -22,7 +22,7 @@ A common refrain you will encounter when reading this literature is about how ra
 
 Reading these papers, I struggled to understand _why_ transmittance from raymarching was biased.
 
-I thought that these papers were stating that calculating transmittance like this:
+I thought that these papers were stating that calculating transmittance as seen below was inherently biased.
 
 ```
 float jitter = random01();
@@ -34,8 +34,6 @@ for(float i = 0.0f; i < stepCount; i+=1.0f)
 }
 float transmittance = exp(-opticalDepth);
 ```
-
-Was inherently biased.
 
 PBRT's [3rd Edition](https://pbr-book.org/3ed-2018/Light_Transport_II_Volume_Rendering/Sampling_Volume_Scattering) states:
 
@@ -85,8 +83,6 @@ for(int i = 0.0f; i < monteCarloIterations; i += 1.0f)
 
 The difference, is that we're averaging _transmittance_ as a part of our render. **Not** optical depth.
 
-I.e. we're effectively doing:
-
 ```
 float opticalDepthEstimate(float jitter)
 {
@@ -105,14 +101,12 @@ for(float i = 0.0f; i < iterationCount; i += 1.0f)
 }
 ```
 
-Which is not equivalent.
-
-We're looking to evaluate:
+The equation we're looking to evaluate is:
 
 $$
 exp(-\int opticalDepth(t)dt) \simeq exp(-E[opticalDepth])
 $$
-But the formulation above evaluates:
+But the code above evaluates:
 
 $$
 E[exp(-opticalDepth)]
@@ -134,9 +128,9 @@ I thought the bias arose from our use of raymarching.
 
 But the bias actually arises from our approach to averaging transmittance instead of averaging optical depth.
 
-Note how the paragraph even states:
+The paragraph even states:
 
-"The naive approach to estimate T is to compute an unbiased Monte Carlo estimate X...and to use exp(-X) as transmittance estimate"
+> The naive approach to estimate T is to compute an unbiased Monte Carlo estimate X...and to use exp(-X) as transmittance estimate.
 
 The mention of raymarching is simply an example of a method one could use to estimate the optical depth. Not the source of the problem.
 
