@@ -43,7 +43,7 @@ PBRT's [3rd Edition](https://pbr-book.org/3ed-2018/Light_Transport_II_Volume_Ren
 
 After further investigation and experimentation, I don't think these sources are suggesting that evaluating transmittance using raymarching is biased.
 
-I.e. evaluating transmittance in the way seen in the code below is a completely valid and unbiased way to estimate transmittance.
+Evaluating transmittance in the way seen in the code below is a completely valid and unbiased way to estimate transmittance.
 
 ```
 float opticalDepthEstimate(float jitter)
