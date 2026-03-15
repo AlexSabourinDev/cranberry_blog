@@ -8,15 +8,15 @@ A common refrain you will encounter when reading this literature is about how ra
 
 [PBRT](https://pbr-book.org/4ed/Volume_Scattering/Transmittance):
 
- ![[PBRT_TransmittanceBias.png]]
+ ![](WhyRaymarchedTransmittanceIsBiased_Assets/PBRT_TransmittanceBias.png)
 
 [Jackknife Transmittance and MIS Weight Estimation](https://dl.acm.org/doi/epdf/10.1145/3763273):
 
-![[Jackknife_TransmittanceBias.png]]
+![](WhyRaymarchedTransmittanceIsBiased_Assets/Jackknife_TransmittanceBias.png)
 
 [Unbiased Global Illumination with Participating Media](https://www.uni-ulm.de/fileadmin/website_uni_ulm/iui.inst.100/institut/Papers/ugiwpm.pdf):
 
-![[GlobalIlluminationParticipatingMedia_TransmittanceBias.png]]
+![](WhyRaymarchedTransmittanceIsBiased_Assets/GlobalIlluminationParticipatingMedia_TransmittanceBias.png)
 
 ## What's The Problem?
 
@@ -39,7 +39,7 @@ Was inherently biased.
 
 PBRT's [3rd Edition](https://pbr-book.org/3ed-2018/Light_Transport_II_Volume_Rendering/Sampling_Volume_Scattering) states:
 
-![](PBRT3ed_TransmittanceBias.png)
+![](WhyRaymarchedTransmittanceIsBiased_Assets/PBRT3ed_TransmittanceBias.png)
 
 ## The Truth
 
@@ -126,7 +126,7 @@ $$
 
 This is further reinforced if we return to the comment made in [Jackknife Transmittance and MIS Weight Estimation](https://dl.acm.org/doi/epdf/10.1145/3763273):
 
-![](Jackknife_TransmittanceBias.png)
+![](WhyRaymarchedTransmittanceIsBiased_Assets/Jackknife_TransmittanceBias.png)
 
 Note how the author states "this strategy systematically **overestimates** the transmittance". Pointing out that the _incorrect_ form of our estimator is the one where we average **transmittance**. The left term in the equation.
 
